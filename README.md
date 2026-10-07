@@ -24,4 +24,5 @@ Usamos os seguintes scripts python para o parsing / filtragem:
 - **results_scrapper.py** : Responsável por fazer o parse do arquivo de **Resultados finais do 3°subprograma do PAS**, 
 o que gera diversos metadados _(notas por subprograma, posição, argumento final...)_;
 - **classificated_filter.py** : Responsável por fazer o parse do arquivo de **Convocados para os cursos de graduação**, gerando
-metadados sobre os convocados por categoria de cota, com número de vagas detalhado por curso.
+metadados sobre os convocados por categoria de cota, com número de vagas detalhado por curso, que pode ser usado em conjunto com o
+CSV das notas para mapear candidatos do curso de computação e seu desempenho.
