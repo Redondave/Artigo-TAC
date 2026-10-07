@@ -4,7 +4,7 @@ import csv
 import re
 import pypdf
 
-def extract_data_from_pdf(pdf_path):
+def extract_results_from_pdf(pdf_path):
     # define os campos que serão extraídos do PDF
     headers = ['N° de inscrição','Nome', 'Score bruto 1° parte (sub1)', 'Score bruto 2° parte (sub2)', 'Nota da redação (sub1)',
                'Score bruto 1° parte (sub1)', 'Score bruto 2° parte (sub2)', 'Nota da redação (sub2)',
@@ -49,6 +49,10 @@ def main():
     resources_path = '../resources'
 
     # percorre todos os arquivos na pasta 'resources'
-    extracted = extract_data_from_pdf(os.path.join(resources_path, 'notas_e_classificacao_sub3_2025.pdf'))
+    extracted = extract_results_from_pdf(os.path.join(resources_path, 'notas_e_classificacao_sub3_2025.pdf'))
+    if extracted:
+        print(f"Extração concluída com sucesso. {len(extracted)} registros extraídos.")
+    else:
+        print("Nenhum registro foi extraído.")
 
 main()
