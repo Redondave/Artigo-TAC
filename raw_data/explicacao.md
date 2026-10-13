@@ -53,6 +53,12 @@ Cada pasta de edital tem o nome do tipo de edital e contém os PDFs referentes a
 - **Dados fornecidos:** campus/curso/turno, número de inscrição, nome da pessoa, escore bruto (EB) das partes 1 e 2 e nota da redação das etapas 1, 2 e 3 (o tipo D já está incluído no EB), argumento final e classificação nos sistemas de cotas.
 - Na classificação por cota, `-` significa que a pessoa não participou daquela cota, e um número é a classificação dela nessa cota. As colunas de cota se sobrepõem: a mesma pessoa pode ter classificação em mais de uma.
 
+### Edital de abertura da terceira etapa
+
+- Contém as regras da etapa: sistemas de cotas e subsistemas, critérios de elegibilidade, validação de autodeclaração, ordem de seleção e remanejamento de vagas, além do **quadro de vagas** por curso e cota.
+- Fica em `PAS3/Edital_de_abertura/edital_de_abertura.pdf`.
+- O resumo comparativo da década está em [`regulamentos.md`](regulamentos.md).
+
 ##  Tipos de editais importantes para o PAS 1 e o PAS 2
 
 ### Resultado final de PAS 1 e PAS 2, mais as retificações dele

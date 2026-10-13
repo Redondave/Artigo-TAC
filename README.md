@@ -8,7 +8,7 @@ prova a prova **(PAS 1, PAS 2 e PAS 3)** e subprograma a subprograma, sob a pers
 ## Bases de dados
 - **Editais** oficiais e relatórios de resultados de 10 ou mais subprogramas do PAS/UnB;
 - **Gráficos** construídos a partir dos dados estatísticos obtidos por meio de parsing;
-- **Normas** e consultas da avaliação PAS/UnB
+- **Normas** e consultas da avaliação PAS/UnB (resumo dos editais de abertura em [`raw_data/regulamentos.md`](raw_data/regulamentos.md))
 
 # O Projeto
 
