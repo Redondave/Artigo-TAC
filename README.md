@@ -20,9 +20,17 @@ formatá-los em **CSVs** a serem a base estatística para o trabalho:
 - **/parsed_data** : Armazena os resultados do processamento.
 
 ## Scripts
-Usamos os seguintes scripts python para o parsing / filtragem:
-- **results_scrapper.py** : Responsável por fazer o parse do arquivo de **Resultados finais do 3°subprograma do PAS**, 
-o que gera diversos metadados _(notas por subprograma, posição, argumento final...)_;
-- **classificated_filter.py** : Responsável por fazer o parse do arquivo de **Convocados para os cursos de graduação**, gerando
-metadados sobre os convocados por categoria de cota, com número de vagas detalhado por curso, que pode ser usado em conjunto com o
-CSV das notas para mapear candidatos do curso de computação e seu desempenho.
+Os extratores ficam em **`scripts/pas/`** e leem todos os PDFs de `raw_data/` de uma vez:
+
+```bash
+pip install pypdf
+python3 scripts/pas/build_tables.py   # gera as tabelas em parsed_data/
+python3 scripts/pas/validate.py       # gera parsed_data/validacao.md
+```
+
+Saídas principais em `parsed_data/`:
+- **tabela1_alunos.csv**: uma linha por candidato e subprograma, com notas das 3 etapas, argumento final, classificação em cada cota, aprovação e homologação (anonimizado, sem nomes);
+- **tabela2_curso_cota.csv**: vagas, inscritos, convocados e notas de corte por subprograma, curso, semestre e categoria de cota;
+- **subprogramas.csv**: datas e regras de cada subprograma.
+
+Como a extração foi feita, as decisões tomadas e as limitações dos dados estão em [`metodologia.md`](metodologia.md). O plano do artigo está em [`docs/plano-artigo.md`](docs/plano-artigo.md).
