@@ -50,7 +50,21 @@ def _limpa_curso(name):
     return norm_key(name)
 
 
+def _junta_numeros(lines):
+    """Une linhas só de números quando a fileira do quadro foi quebrada (ex.: "7" + "5 15 5 ...")."""
+    out = []
+    for ln in lines:
+        s = ' '.join(ln.split())
+        if (out and re.fullmatch(r'(\d+\s*)+', s) and re.fullmatch(r'(\d+\s*){1,3}', out[-1])
+                and len((out[-1] + ' ' + s).split()) in (10, 11)):
+            out[-1] = out[-1] + ' ' + s
+        else:
+            out.append(s)
+    return out
+
+
 def parse_quadro(lines, ordem):
+    lines = _junta_numeros(lines)
     rows = []
     campus = turno = ''
     buf = []

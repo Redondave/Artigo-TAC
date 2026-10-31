@@ -20,17 +20,22 @@ formatá-los em **CSVs** a serem a base estatística para o trabalho:
 - **/parsed_data** : Armazena os resultados do processamento.
 
 ## Scripts
-Os extratores ficam em **`scripts/pas/`** e leem todos os PDFs de `raw_data/` de uma vez:
+Os extratores ficam em **`scripts/pas/`** e leem todos os PDFs de `raw_data/` de uma vez. Para gerar tudo:
 
 ```bash
-pip install pypdf
-python3 scripts/pas/build_tables.py   # gera as tabelas em parsed_data/
-python3 scripts/pas/validate.py       # gera parsed_data/validacao.md
+pip install pypdf            # e poppler-utils (pdftotext), usado na validação
+python3 scripts/pas/run_all.py
 ```
 
-Saídas principais em `parsed_data/`:
-- **tabela1_alunos.csv**: uma linha por candidato e subprograma, com notas das 3 etapas, argumento final, classificação em cada cota, aprovação e homologação (anonimizado, sem nomes);
-- **tabela2_curso_cota.csv**: vagas, inscritos, convocados e notas de corte por subprograma, curso, semestre e categoria de cota;
-- **subprogramas.csv**: datas e regras de cada subprograma.
+O `run_all.py` roda a extração (`build_tables.py`), os filtros do grupo (`alteracoes_de_pipeline/remove_14-16.py` e `remove_eng_software.py`) e a validação (`validate.py`).
 
-Como a extração foi feita, as decisões tomadas e as limitações dos dados estão em [`metodologia.md`](metodologia.md). O plano do artigo está em [`docs/plano-artigo.md`](docs/plano-artigo.md).
+**Tabelas do artigo** (em `parsed_data/`):
+- **tabela1_alunos_sem_eng_soft.csv**: uma linha por candidato e subprograma, com notas das 3 etapas, argumento final, classificação em cada cota, aprovação e homologação (anonimizado, sem nomes);
+- **tabela2_curso_cota_sem_eng_soft.csv**: vagas, inscritos, convocados e notas de corte por subprograma, curso, turno, semestre e categoria de cota;
+- **subprogramas_sem_eng_soft.csv**: datas e regras de cada subprograma.
+
+Documentação:
+- [`docs/glossario.md`](docs/glossario.md): o que cada coluna significa e de onde vem;
+- [`metodologia.md`](metodologia.md): como os dados foram extraídos, as correções feitas e o resumo da validação;
+- [`parsed_data/validacao.md`](parsed_data/validacao.md): relatório completo dos 13 testes de qualidade;
+- [`docs/plano-artigo.md`](docs/plano-artigo.md): o plano do artigo.

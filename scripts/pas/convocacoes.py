@@ -10,16 +10,37 @@ Relação de selecionados: quem teve o registro acadêmico homologado.
 import os
 import re
 
-from common import RAW, flat, norm_key, pdf_pages
+from common import RAW, flat, norm_key, pdf_pages, strip_accents
 import cotas
 from resultado_pas3 import MARK, build_stream, parse_campus, parse_curso, _strip_numbering
 
 INSC = r'(\d(?:\s?\d){7})'
-REC_RE = re.compile(r'(?<![\d.])' + INSC + r'\s*,?\s+([^\d\x01\x02/]+?)\s*,?\s*(\d{1,4})(?![\d.])')
+# o último registro de cada bloco termina com ponto final ("Gabriele Dantas Gontijo, 2."):
+# o número pode ser seguido de ponto, desde que não seja um decimal
+REC_RE = re.compile(r'(?<![\d.])' + INSC + r'\s*,?\s+([^\d\x01\x02/]+?)\s*,?\s*(\d{1,4})(?!\d)(?!\.\d)')
 NOME_INSC_RE = re.compile(r'(?<![\d.])' + INSC + r'(?![\d.])')
 
 ORDINAIS = {'PRIMEIR': 1, 'SEGUND': 2, 'TERCEIR': 3, 'QUART': 4, 'QUINT': 5,
             'SEXT': 6, 'SETIM': 7, 'SÉTIM': 7, 'OITAV': 8, 'NON': 9, 'DECIM': 10}
+
+
+# 15-17: a 1ª convocação dos dois semestres é a "convocação geral" (Edital nº 38, de 27/1/2018).
+# O Edital nº 46, de 20/6/2018 (arquivo 1_chamada_2_semestre.pdf), não traz o ordinal no texto,
+# mas fica entre a geral e a "terceira convocação" do 2º semestre (Edital nº 47): é a 2ª chamada.
+CHAMADA_CORRIGIDA = {('15-17', '1_chamada_2_semestre.pdf'): 2}
+
+
+def chamada_no_texto(text):
+    """Número da chamada dito no próprio edital ("segunda convocação", "em terceira chamada")."""
+    m = re.search(r'torna[m]?\s+p[úu]blicas?\s+(?:a\s+rela[çc][ãa]o[^.]{0,200}?e\s+)?a\s+'
+                  r'(?:convoca[çc][ãa]o,?\s+em\s+)?(\w+)\s+(?:convoca|chamada)', text[:3000], re.I)
+    if not m:
+        return None
+    w = strip_accents(m.group(1)).upper()
+    for k, v in ORDINAIS.items():
+        if w.startswith(strip_accents(k)):
+            return v
+    return None
 
 
 def _from_name(name):
@@ -43,6 +64,8 @@ def _marker_kind(h):
         return 'curso'
     if re.match(r'(DA|DO|DOS|DAS)\b', k):
         return 'section'
+    if re.search(r'BACHAREL|LICENCIA', k):
+        return 'curso'  # cursos sem parênteses ("LICENCIATURA EM FÍSICA")
     return 'other'
 
 
@@ -152,13 +175,53 @@ def extract_convocacoes(subprograma):
             continue
         else:
             chamada, semestre = _from_name(name)
+            ch_texto = chamada_no_texto(text)
             if chamada is None:
                 # convocação geral de 15-17: primeira chamada dos dois semestres
                 chamada = 1
+            if (subprograma, name) in CHAMADA_CORRIGIDA:
+                chamada = CHAMADA_CORRIGIDA[(subprograma, name)]
+            elif ch_texto and ch_texto != chamada:
+                chamada = ch_texto
+            # 18-20: as convocações são para o "quantitativo total das vagas", sem semestre
+            cab = text[:2500].lower()
+            if 'quantitativo total das vagas' in cab and 'semestre' not in cab:
+                semestre = 0
             r, s = parse_convocacao(path, subprograma, chamada, semestre)
+            s['chamada_nome_arquivo'] = _from_name(name)[0]
+            s['chamada_texto'] = ch_texto
+            s['chamada_usada'] = chamada
         rows += r
         stats.append(s)
-    return rows, stats
+    # O mesmo bloco pode aparecer duas vezes no PDF (21-23, Enfermagem no 2º semestre):
+    # remove registros idênticos. Editais SJ que só repetem a convocação de quem já
+    # foi convocado (reenvio de documentos) marcam o registro como sub judice.
+    vistos, regulares, out = set(), {}, []
+    removidos = 0
+    for r in rows:
+        if r['chamada'] is None:
+            continue
+        key = (r['inscricao'], r['campus'], r['curso'], r['semestre'], r['chamada'], r['cota'])
+        if key in vistos:
+            removidos += 1
+            continue
+        vistos.add(key)
+        regulares.setdefault(r['inscricao'], []).append(r)
+        out.append(r)
+    sj_repetidos = 0
+    for r in rows:
+        if r['chamada'] is not None:
+            continue
+        if r['inscricao'] in regulares:
+            for x in regulares[r['inscricao']]:
+                x['sub_judice'] = True
+            sj_repetidos += 1
+        else:
+            out.append(r)
+    stats.append({'arquivo': '(deduplicação)', 'modo': 'dedup', 'legenda': 0,
+                  'extraidos': -removidos, 'sem_cota': 0,
+                  'duplicados_removidos': removidos, 'sj_ja_convocados': sj_repetidos})
+    return out, stats
 
 
 def extract_relacoes(subprograma):

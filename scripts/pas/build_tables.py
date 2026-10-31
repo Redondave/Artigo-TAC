@@ -9,6 +9,7 @@ Saídas em parsed_data/:
 Uso:  python3 scripts/pas/build_tables.py
 """
 import csv
+import difflib
 import os
 import re
 import sys
@@ -60,7 +61,8 @@ def curso_area(curso):
 
 
 def limpa_curso(curso):
-    curso = re.sub(r'\s*-?\s*(SUB\s*)?JUDICE\s*', '', norm_key(curso)).strip(' -')
+    curso = re.sub(r'\s*/\s*CANDIDATOS\s+SUB JUDICE.*$', '', norm_key(curso))
+    curso = re.sub(r'\s*-?\s*(SUB\s*)?JUDICE\s*', '', curso).strip(' -')
     curso = re.sub(r'\s*\(\s*\)\s*', ' ', curso).strip()
     return curso
 
@@ -74,8 +76,126 @@ def campus_key(campus):
     return c
 
 
-def course_key(campus, curso):
-    return (campus_key(campus), limpa_curso(curso))
+# Só o Darcy Ribeiro e Planaltina oferecem o mesmo curso em dois turnos; nos outros
+# campi o turno não aparece em todos os editais, então não entra na chave.
+CAMPI_COM_TURNO = ('DARCY RIBEIRO', 'PLANALTINA')
+
+
+def course_key(campus, curso, turno=''):
+    """(campus, turno, curso): o mesmo curso pode existir no diurno e no noturno."""
+    c = campus_key(campus)
+    t = norm_key(turno or '') if c in CAMPI_COM_TURNO else ''
+    return (c, t, limpa_curso(curso))
+
+
+SINONIMOS = [(r'\bMSI\b', 'MULTILINGUISMO E SOCIEDADE DA INFORMACAO'), (r'\bSEG\.', 'SEGUNDA'),
+             (r'URANISMO', 'URBANISMO'), (r'QUIMICA TECNOLOGIA\b', 'QUIMICA TECNOLOGICA'),
+             (r'LINGUAS ESTRANGEIRAS APLICADAS', 'LINGUA ESTRANGEIRA APLICADA')]
+STOP = {'EM', 'DE', 'DO', 'DA', 'E', 'COMO'}
+
+
+def _compacto(nome):
+    n = limpa_curso(nome)
+    for pat, rep in SINONIMOS:
+        n = re.sub(pat, rep, n)
+    return re.sub(r'[^A-Z]', '', n)
+
+
+def _compacto_tokens(nome):
+    """Junta palavras partidas pelo PDF ("PSI COLOGO") antes de separar as palavras."""
+    return re.sub(r'\bPSI COLOGO\b', 'PSICOLOGO', nome)
+
+
+def _tokens(nome):
+    n = limpa_curso(nome)
+    for pat, rep in SINONIMOS:
+        n = re.sub(pat, rep, n)
+    return {t for t in re.split(r'[^A-Z]+', n) if t and t not in STOP}
+
+
+GRAU = {'BACHARELADO', 'BACHARELADOS', 'LICENCIATURA', 'BACHAREL', 'BACHARELA'}
+
+
+def _contido(a, b):
+    """Toda palavra relevante de `a` aparece (ou é prefixo de uma palavra) em `b`."""
+    ta = {t for t in _tokens(a) if len(t) > 2 and t not in GRAU}
+    tb = {t for t in _tokens(b) if len(t) > 2}
+    return bool(ta) and all(any(y.startswith(x) or x.startswith(y) for y in tb) for x in ta)
+
+
+class Canonico:
+    """Casa o curso de cada edital com o curso do Quadro de Vagas do edital de abertura.
+
+    Os editais do mesmo subprograma escrevem o mesmo curso de formas diferentes ("LETRAS -
+    PORTUGUÊS DO BRASIL COMO SEGUNDA LÍNGUA" x "LETRAS PORTUGUÊS DO BRASIL COMO SEG. LÍNGUA",
+    "LICENCIATURA EM MÚSICA" x "MÚSICA (LICENCIATURA)"). O curso do quadro de vagas é o canônico.
+    Regras, em ordem, no mesmo campus e turno: (1) nome igual; (2) igual sem pontuação;
+    (3) mesmo conjunto de palavras; (4) um único curso do quadro cujas palavras contêm as do
+    nome (ou vice-versa) e com semelhança de caracteres >= 0,75. Se nada casar no campus e turno
+    (cabeçalho de campus perdido numa página), procura o nome por (1)-(3) nos outros campi e só
+    aceita se houver uma única opção. Cada decisão fica em
+    parsed_data/intermediarios/correspondencia_cursos.csv.
+    """
+
+    def __init__(self, sp, vag):
+        self.sp = sp
+        self.por_local = defaultdict(set)
+        self.rotulo = {}
+        for v in vag:
+            k = course_key(v['campus'], v['curso'], v['turno'])
+            self.por_local[k[:2]].add(k[2])
+            self.rotulo[k] = (v['campus'], v['turno'])
+        self.cache = {}
+        self.log = []
+
+    def _casa(self, nome, opcoes, permite_semelhanca=True):
+        if nome in opcoes:
+            return nome, 'exato', 1.0
+        iguais = [o for o in opcoes if _compacto(o) == _compacto(nome)]
+        if len(iguais) == 1:
+            return iguais[0], 'sem pontuação', 1.0
+        mesmos = [o for o in opcoes if _tokens(o) == _tokens(nome)]
+        if len(mesmos) == 1:
+            return mesmos[0], 'mesmas palavras', 1.0
+        if permite_semelhanca:
+            cand = [o for o in opcoes if _contido(nome, o) or _contido(o, nome)]
+            cand = [(difflib.SequenceMatcher(None, _compacto(o), _compacto(nome)).ratio(), o) for o in cand]
+            cand = [x for x in cand if x[0] >= 0.75]
+            if len(cand) == 1:
+                return cand[0][1], 'palavras contidas', round(cand[0][0], 3)
+        return None, None, None
+
+    def __call__(self, campus, turno, curso, origem):
+        """Devolve (campus, turno, curso) canônicos."""
+        k = course_key(campus, curso, turno)
+        if k in self.cache:
+            return self.cache[k]
+        out, metodo, score = (campus, turno, k[2]), 'sem correspondência', None
+        if not self.por_local:
+            out, metodo = (campus, turno, k[2]), 'sem quadro de vagas'
+        else:
+            nome, metodo_, score_ = self._casa(k[2], self.por_local.get(k[:2], set()))
+            if nome:
+                out, metodo, score = (campus, turno, nome), metodo_, score_
+            else:
+                achados = []
+                for loc, ops in self.por_local.items():
+                    if loc == k[:2]:
+                        continue
+                    n2, m2, s2 = self._casa(k[2], ops, permite_semelhanca=False)
+                    if n2:
+                        achados.append((loc, n2, m2))
+                if len(achados) == 1:
+                    loc, n2, m2 = achados[0]
+                    c_, t_ = self.rotulo[(loc[0], loc[1], n2)]
+                    out, metodo, score = (c_, t_, n2), f'{m2}, outro campus/turno', 1.0
+        self.cache[k] = out
+        if metodo != 'exato':
+            self.log.append({'subprograma': self.sp, 'origem': origem, 'campus': k[0], 'turno': k[1],
+                             'nome_no_pdf': k[2], 'campus_canonico': campus_key(out[0]),
+                             'turno_canonico': out[1], 'nome_canonico': out[2], 'metodo': metodo,
+                             'semelhanca': score})
+        return out
 
 
 def sistema_inscricao(row):
@@ -112,6 +232,45 @@ def build_subprograma(sp, log):
     log[sp] = {'pas3': st3, 'pas1': st1, 'pas2': st2, 'convocacoes': stc,
                'relacoes': str_, 'vagas': stv, 'meta': meta}
 
+    # O mesmo curso pode ter grafias diferentes nos quadros do 1º e do 2º semestre
+    # ("PSICÓLOGO" x "PSI COLOGO", "LICENCIATURA EM ARTES VISUAIS" x "ARTES VISUAIS
+    # (LICENCIATURA)"): unifica pelo conjunto de palavras, preferindo a grafia do resultado.
+    nomes_resultado = {course_key(r['campus'], r['curso'], r['turno']) for r in pas3}
+    grupos = defaultdict(list)
+    for v in vag:
+        k = course_key(v['campus'], v['curso'], v['turno'])
+        grupos[(k[0], k[1], frozenset(_tokens(_compacto_tokens(k[2]))))].append(v)
+    for g in grupos.values():
+        nomes = {course_key(v['campus'], v['curso'], v['turno']) for v in g}
+        if len(nomes) > 1:
+            pref = [n for n in nomes if n in nomes_resultado] or sorted(nomes, key=lambda n: -len(n[2]))
+            for v in g:
+                v['curso'] = pref[0][2]
+
+    # nome canônico do curso (o do quadro de vagas) em todos os editais
+    canon = Canonico(sp, vag)
+    for r in pas3:
+        r['curso_pdf'] = limpa_curso(r['curso'])
+        r['campus'], r['turno'], r['curso'] = canon(r['campus'], r['turno'], r['curso'], 'resultado final')
+    for c in conv:
+        if c['curso']:
+            c['campus'], c['turno'], c['curso'] = canon(c['campus'], c['turno'], c['curso'], 'convocação')
+    log[sp]['correspondencia'] = canon.log
+
+    # Sem SISUnB (a partir de 17-19) o curso do candidato é o da inscrição, publicado no
+    # resultado final; a convocação não pode mudá-lo. O curso da convocação só é usado
+    # para candidatos fora do resultado. Nos anos com SISUnB vale o curso da convocação.
+    if not SUBPROGRAMA_INFO[sp]['sisunb']:
+        p3_loc = {r['inscricao']: (r['campus'], r['turno'], r['curso']) for r in pas3}
+        corrigidos = 0
+        for c in conv:
+            loc = p3_loc.get(c['inscricao'])
+            if loc and c['curso'] and course_key(c['campus'], c['curso'], c['turno']) != course_key(*loc[:1], loc[2], loc[1]):
+                corrigidos += 1
+            if loc:
+                c['campus'], c['turno'], c['curso'] = loc
+        log[sp]['convocacoes_curso_do_resultado'] = corrigidos
+
     # 14-16 não tem editais de convocação: a "relação dos selecionados" faz esse papel
     if not conv:
         conv = [{'subprograma': sp, 'inscricao': r['inscricao'], 'campus': '', 'turno': '',
@@ -141,6 +300,7 @@ def build_subprograma(sp, log):
             for lab in cotas.TODAS:
                 row['class_' + lab] = r3['class_' + lab]
             row['curso'] = limpa_curso(r3['curso'])
+            row['curso_pdf'] = r3['curso_pdf']
         else:
             for etapa, r in ((1, r1), (2, r2)):
                 if r:
@@ -160,28 +320,42 @@ def build_subprograma(sp, log):
             row['cota_aprovacao'] = first['cota']
             row['curso_aprovacao'] = limpa_curso(first['curso']) if first['curso'] else row.get('curso', '')
             row['n_convocacoes'] = len(cs)
+            # SISUnB (até 16-18): o candidato podia trocar de curso depois do resultado
+            if row.get('curso') and row['curso_aprovacao'] and SUBPROGRAMA_INFO[sp]['sisunb']:
+                row['curso_mudou_sisunb'] = row['curso_aprovacao'] != row['curso']
         row['homologado'] = (insc in homologados) if tem_homologacao else None
         row['faixa_renda_regra'] = meta['faixa_renda'] if not sp in LEI_14723 else '1 SM'
         alunos.append(row)
 
     # tabela 2
     af = {r['inscricao']: r['argumento_final'] for r in pas3}
-    insc_curso = {r['inscricao']: course_key(r['campus'], r['curso']) for r in pas3}
+    insc_curso = {r['inscricao']: course_key(r['campus'], r['curso'], r['turno']) for r in pas3}
     inscritos = defaultdict(int)
     for r in pas3:
-        k = course_key(r['campus'], r['curso'])
+        k = course_key(r['campus'], r['curso'], r['turno'])
         for lab in cotas.TODAS:
             if r['class_' + lab] is not None:
                 inscritos[(k, lab)] += 1
     conv_cell = defaultdict(list)
     for c in conv:
-        k = course_key(c['campus'], c['curso']) if c['curso'] else insc_curso.get(c['inscricao'])
+        k = course_key(c['campus'], c['curso'], c['turno']) if c['curso'] else insc_curso.get(c['inscricao'])
         if k is None:
             continue
         conv_cell[(k, c['semestre'], c['cota'] or 'DESCONHECIDA')].append(c)
+    # 18-20: convocações sem semestre (semestre 0 = ingresso único): soma as vagas dos dois semestres
+    if conv and all(c['semestre'] == 0 for c in conv if c['chamada'] is not None):
+        soma = {}
+        for v in vag:
+            k = (v['campus'], v['turno'], v['curso'])
+            if k not in soma:
+                soma[k] = dict(v, semestre=0)
+            else:
+                for lab in cotas.TODAS + ['total']:
+                    soma[k][lab] += v[lab]
+        vag = list(soma.values())
     cells = {}
     for v in vag:
-        k = course_key(v['campus'], v['curso'])
+        k = course_key(v['campus'], v['curso'], v['turno'])
         for lab in cotas.TODAS:
             cells[(k, v['semestre'], lab)] = {'vagas': v[lab], 'campus': v['campus'], 'turno': v['turno']}
     for (k, sem, lab) in conv_cell:
@@ -192,10 +366,10 @@ def build_subprograma(sp, log):
         notas1 = [af[c['inscricao']] for c in cs if c['chamada'] == 1 and af.get(c['inscricao']) is not None]
         notas = [af[c['inscricao']] for c in cs if af.get(c['inscricao']) is not None]
         linhas.append({
-            'chave': f'{sp}|{k[0]}|{k[1]}|{sem}|{lab}',
-            'subprograma': sp, 'campus': k[0], 'curso': k[1], 'semestre': sem,
+            'chave': f'{sp}|{k[0]}|{k[1]}|{k[2]}|{sem}|{lab}',
+            'subprograma': sp, 'campus': k[0], 'turno': k[1], 'curso': k[2], 'semestre': sem,
             'categoria': lab, 'grupo_concorrencia': cotas.GRUPO.get(lab, ''),
-            'area_computacao': curso_area(k[1]),
+            'area_computacao': curso_area(k[2]),
             'vagas': info['vagas'],
             'inscritos': inscritos.get((k, lab), 0) if lab != 'DESCONHECIDA' else None,
             'convocados': len(cs),
@@ -221,14 +395,14 @@ def build_subprograma(sp, log):
     return alunos, linhas, conv_out, rel_out, vag, info
 
 
-TAB1 = (['subprograma', 'id_aluno', 'campus', 'turno', 'curso', 'area_computacao',
+TAB1 = (['subprograma', 'id_aluno', 'campus', 'turno', 'curso', 'curso_pdf', 'area_computacao',
          'compareceu_pas1', 'compareceu_pas2', 'compareceu_pas3']
         + resultado_pas3.NOTAS + ['argumento_final']
         + ['class_' + l for l in cotas.TODAS]
         + ['sistema_inscricao', 'grupo_concorrencia', 'aprovado', 'cota_aprovacao',
-           'chamada_aprovacao', 'semestre_aprovacao', 'curso_aprovacao', 'n_convocacoes',
+           'chamada_aprovacao', 'semestre_aprovacao', 'curso_aprovacao', 'curso_mudou_sisunb', 'n_convocacoes',
            'homologado', 'sub_judice', 'faixa_renda_regra'])
-TAB2 = ['chave', 'subprograma', 'campus', 'curso', 'semestre', 'categoria', 'grupo_concorrencia',
+TAB2 = ['chave', 'subprograma', 'campus', 'turno', 'curso', 'semestre', 'categoria', 'grupo_concorrencia',
         'area_computacao', 'vagas', 'inscritos', 'convocados', 'convocados_1a_chamada',
         'ultima_chamada', 'nota_corte_1a_chamada', 'nota_corte_ultima_chamada']
 SUBP = ['subprograma', 'data_prova_pas3', 'sisunb', 'lei_14723', 'faixa_renda',
@@ -243,7 +417,8 @@ def main(subprogramas=SUBPROGRAMAS):
         a, l, c, r, v, i = build_subprograma(sp, log)
         t1 += a; t2 += l; cv += c; rl += r; vg += v; sb.append(i)
         print(f'{sp}: {len(a)} candidatos, {i["candidatos_pas3"]} no PAS 3, '
-              f'{i["convocados"]} convocados, {len(l)} linhas na tabela 2')
+              f'{i["convocados"]} convocados, {len(l)} linhas na tabela 2, '
+              f'{log[sp].get("convocacoes_curso_do_resultado", "-")} convocações reposicionadas no curso do resultado')
     write_csv(os.path.join(PARSED, 'tabela1_alunos.csv'), t1, TAB1)
     write_csv(os.path.join(PARSED, 'tabela2_curso_cota.csv'), t2, TAB2)
     write_csv(os.path.join(PARSED, 'subprogramas.csv'), sb, SUBP)
@@ -252,6 +427,10 @@ def main(subprogramas=SUBPROGRAMAS):
                'cota', 'classificacao_cota', 'sub_judice', 'arquivo'])
     write_csv(os.path.join(INTERMEDIARIOS, 'relacoes_selecionados.csv'), rl,
               ['subprograma', 'id_aluno', 'chamada', 'semestre', 'tipo', 'sub_judice', 'arquivo'])
+    write_csv(os.path.join(INTERMEDIARIOS, 'correspondencia_cursos.csv'),
+              [x for sp in log for x in log[sp]['correspondencia']],
+              ['subprograma', 'origem', 'campus', 'turno', 'nome_no_pdf', 'campus_canonico',
+               'turno_canonico', 'nome_canonico', 'metodo', 'semelhanca'])
     write_csv(os.path.join(INTERMEDIARIOS, 'vagas.csv'), vg,
               ['subprograma', 'semestre', 'campus', 'turno', 'curso', 'total'] + cotas.TODAS)
     return log

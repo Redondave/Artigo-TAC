@@ -84,6 +84,10 @@ def _header_kind(h):
         return 'section'
     if '(' in k and ')' in k:
         return 'curso'
+    # cursos sem parênteses: "BACHARELADO EM QUÍMICA", "LICENCIATURA EM FÍSICA",
+    # "CIÊNCIAS SOCIAIS - ANTROPOLOGIA/SOCIOLOGIA BACHARELADO/LICENCIATURA"
+    if re.search(r'BACHAREL|LICENCIA', k):
+        return 'curso'
     return 'other'
 
 
@@ -99,6 +103,7 @@ def parse_campus(h):
 def parse_curso(h):
     k = norm_key(_strip_numbering(h))
     sj = 'SUB JUDICE' in k
+    k = re.sub(r'\s*/\s*CANDIDATOS\s+SUB JUDICE.*$', '', k)  # "DIREITO (BACHARELADO)/ CANDIDATOS SUB JUDICE"
     k = re.sub(r'\s*-?\s*SUB JUDICE\s*', '', k).strip(' -*')
     return k, sj
 
@@ -148,7 +153,12 @@ def parse_resultado(path, subprograma, sub_judice_file=False, fallback=None):
                 campus, turno = parse_campus(piece)
                 sj_secao = False
             elif kind == 'curso':
-                curso, sj_secao = parse_curso(piece)
+                novo, sj_novo = parse_curso(piece)
+                # subseção sub judice com o nome do curso cortado ("TECNOLÓGICA (BACHARELADO) -
+                # SUB JUDICE" logo depois de "QUÍMICA TECNOLÓGICA (BACHARELADO)"): mesmo curso
+                if not (sj_novo and curso and curso.endswith(novo)):
+                    curso = novo
+                sj_secao = sj_novo
             elif kind == 'sj':
                 sj_secao = True
             elif kind == 'section' and rows:
