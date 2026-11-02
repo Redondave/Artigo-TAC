@@ -20,7 +20,6 @@ from comum_graficos import CATEGORIAS, PARSED, ROTULOS, ordem_subprogramas, past
 
 
 TABELA_PADRAO = "tabela2_curso_cota_sem_14_16.csv"
-CORES_TI = ["#d95f02", "#1b9e77", "#7570b3", "#e7298a"]
 
 
 def _ler_tabela(nome: str, coluna_nota: str) -> pd.DataFrame:
@@ -103,13 +102,14 @@ def _boxplot(ax, calibracao: pd.DataFrame, categorias: list[str]) -> None:
     ax.boxplot(
         dados,
         positions=np.arange(1, len(categorias) + 1),
-        widths=0.65,
+        widths=0.5, # Levemente mais fino para dar espaço aos pontos
         patch_artist=True,
         showfliers=False,
-        boxprops={"facecolor": "#d9d9d9", "edgecolor": "#666666"},
-        medianprops={"color": "#222222", "linewidth": 1.2},
-        whiskerprops={"color": "#666666"},
-        capprops={"color": "#666666"},
+        boxprops={"facecolor": "#e0e0e0", "edgecolor": "#999999", "alpha": 0.6},
+        medianprops={"color": "#555555", "linewidth": 1.5},
+        whiskerprops={"color": "#999999", "linewidth": 1},
+        capprops={"color": "#999999", "linewidth": 1},
+        zorder=1
     )
 
 
@@ -118,47 +118,89 @@ def criar_figura(t: pd.DataFrame, nota_corte: str):
     calibracao = t[~t["eh_ti"]]
     cursos = sorted(ti["curso"].unique())
     categorias = [c for c in CATEGORIAS if c in t["categoria"].values]
-    fig, axes = plt.subplots(2, 2, figsize=(18, 11), sharey=True)
+    
+    # constrained_layout resolve automaticamente sobreposições de título e eixos
+    fig, axes = plt.subplots(2, 2, figsize=(18, 11), sharey=True, constrained_layout=True)
     axes = axes.ravel()
     x = np.arange(1, len(categorias) + 1)
     subs = ordem_subprogramas(t["subprograma"])
-    cores = dict(zip(subs, plt.get_cmap("viridis")(np.linspace(0.1, 0.9, len(subs)))))
+    
+    # Mapa de cores categóricas (melhor para distinguir anos diferentes)
+    cores = dict(zip(subs, plt.get_cmap("tab10").colors[:len(subs)]))
 
     for ax, curso in zip(axes, cursos):
+        # Limpeza visual (remove bordas desnecessárias)
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color('#cccccc')
+        ax.spines['bottom'].set_color('#cccccc')
+        ax.set_axisbelow(True)
+        ax.grid(axis="y", linestyle="--", alpha=0.5, zorder=0)
+
         _boxplot(ax, calibracao, categorias)
         dados_curso = ti[ti["curso"] == curso]
-        for sub in subs:
+        
+        # Desenha os pontos com Jitter (deslocamento) para não sobreporem totalmente
+        for i, sub in enumerate(subs):
             pontos = dados_curso[dados_curso["subprograma"] == sub]
             if pontos.empty:
                 continue
             pontos = pontos.set_index("categoria").reindex(categorias).dropna(subset=["nota_corte"])
+            
+            # Calcula um pequeno recuo no eixo X baseado no subprograma
+            offset = (i - (len(subs) - 1) / 2) * 0.1
+            x_pos = [x[categorias.index(c)] + offset for c in pontos.index]
+            
             ax.scatter(
-                [x[categorias.index(c)] for c in pontos.index],
+                x_pos,
                 pontos["nota_corte"],
                 color=cores[sub],
-                s=26,
-                alpha=0.9,
+                s=60,                  # Aumentado para melhor visibilidade
+                edgecolors="white",    # Borda branca destaca contra o fundo do boxplot
+                linewidth=1,
+                alpha=0.95,
                 label=sub,
                 zorder=3,
             )
-        ax.set_title(curso, fontsize=10)
+            
+        ax.set_title(curso, fontsize=12, fontweight='bold', color="#333333", pad=12)
         ax.set_xticks(x)
-        ax.set_xticklabels([ROTULOS[c].replace("Sistema Universal (ref.)", "Universal") for c in categorias], rotation=45, ha="right", fontsize=8)
-        ax.grid(axis="y", alpha=0.25)
-        ax.axhline(0, color="#888888", linewidth=0.7)
+        
+        # rotation_mode="anchor" garante que o final da palavra aponte para o tick do eixo
+        ax.set_xticklabels(
+            [ROTULOS[c].replace("Sistema Universal (ref.)", "Universal") for c in categorias], 
+            rotation=45, 
+            ha="right", 
+            rotation_mode="anchor", 
+            fontsize=9
+        )
+        ax.axhline(0, color="#aaaaaa", linewidth=1.2, zorder=0)
 
     for ax in axes[len(cursos) :]:
         ax.set_visible(False)
-    axes[0].set_ylabel(f"Nota de corte ({nota_corte})")
+        
+    axes[0].set_ylabel(f"Nota de corte ({nota_corte})", fontsize=11, labelpad=10)
+    
     handles, labels = axes[0].get_legend_handles_labels()
     if handles:
-        fig.legend(handles, labels, title="Subprograma", loc="upper center", ncol=5)
+        # Legenda movida para o topo, fora da área dos gráficos, sem caixa em volta
+        fig.legend(
+            handles, labels, 
+            title="Subprograma", 
+            loc="upper center", 
+            bbox_to_anchor=(0.5, 1.08), 
+            ncol=len(subs),
+            frameon=False,
+            fontsize=10
+        )
+        
     fig.suptitle(
         "Seletividade dos cursos de TI em relação aos demais cursos da UnB",
-        y=0.99,
-        fontsize=14,
+        fontsize=16,
+        fontweight="bold",
+        color="#222222"
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    
     return fig
 
 
@@ -179,7 +221,6 @@ def main() -> None:
     }[args.nota_corte]
     dados = calcular(_ler_tabela(args.tabela, coluna_nota), coluna_nota)
     
-    # Aqui a única mudança real
     saida = pasta_saida("F7", escopo="computacao", homologados=False)
     
     dados.to_csv(saida / "F7_dados.csv", index=False, float_format="%.3f")
@@ -187,7 +228,7 @@ def main() -> None:
 
     fig = criar_figura(dados, args.nota_corte)
     for extensao in ("png", "pdf"):
-        fig.savefig(saida / f"F7_seletividade_cursos.{extensao}", dpi=300)
+        fig.savefig(saida / f"F7_seletividade_cursos.{extensao}", dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"{len(dados)} linhas agregadas; {dados['eh_ti'].sum()} linhas de TI.")
     print(f"Arquivos salvos em {saida}")
