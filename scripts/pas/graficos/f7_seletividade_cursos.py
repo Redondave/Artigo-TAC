@@ -1,9 +1,13 @@
-"""F7 — Seletividade relativa dos cursos de TI.
+"""F7 — Posição dos cursos de TI nas notas de corte.
 
-Cada painel mostra um curso de TI. Para cada categoria de concorrência, o
-boxplot representa a distribuição das notas de corte dos demais cursos da UnB,
-ao longo dos subprogramas. Os pontos sobrepostos são as notas do curso de TI
-do painel, identificadas pelo subprograma.
+Cada painel mostra um curso de TI. Cada linha representa uma categoria de
+concorrência e acompanha a nota de corte ao longo dos subprogramas. Os pontos
+são anotados com a posição ordinal do curso entre todos os cursos, da maior
+para a menor nota de corte. A faixa de fundo mostra a média dos demais cursos
+e um desvio-padrão em torno dela.
+
+Para melhorar a leitura, as categorias originais são agrupadas em cinco
+macrocategorias: SU, NEG, EP/PCD, EP/PPI e EP/RI.
 
 Quando existem várias células para o mesmo curso, subprograma e categoria
 (campus, turno ou semestre), a nota usada no gráfico é a mediana dessas
@@ -22,11 +26,25 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from comum_graficos import CATEGORIAS, PARSED, ROTULOS, ordem_subprogramas, pasta_saida
+from comum_graficos import CATEGORIAS, PARSED, ordem_subprogramas, pasta_saida
 
 
 TABELA_PADRAO = "tabela2_curso_cota_sem_14_16.csv"
-CORES_TI = ["#d95f02", "#1b9e77", "#7570b3", "#e7298a"]
+MACROCATEGORIAS = ["SU", "NEG", "EP/PCD", "EP/PPI", "EP/RI"]
+ROTULOS_MACRO = {
+    "SU": "Sistema Universal",
+    "NEG": "Cotas para Negros",
+    "EP/PCD": "EP / PCD",
+    "EP/PPI": "EP / PPI",
+    "EP/RI": "EP / renda",
+}
+CORES_MACRO = {
+    "SU": "#222222",
+    "NEG": "#d95f02",
+    "EP/PCD": "#7570b3",
+    "EP/PPI": "#1b9e77",
+    "EP/RI": "#e7298a",
+}
 
 
 def _ler_tabela(nome: str, coluna_nota: str) -> pd.DataFrame:
@@ -55,11 +73,24 @@ def _ler_tabela(nome: str, coluna_nota: str) -> pd.DataFrame:
     ].copy()
     if df.empty:
         raise SystemExit(f"Nenhuma nota de corte válida foi encontrada em {nome}.")
+    # A prioridade evita sobreposição: PCD, depois PPI; o restante das
+    # escolas públicas fica na categoria residual de renda.
+    df["categoria"] = df["categoria"].map(
+        lambda categoria: (
+            categoria
+            if categoria in {"SU", "NEG"}
+            else "EP/PCD"
+            if categoria.endswith("_PCD")
+            else "EP/PPI"
+            if categoria.endswith("_PPI")
+            else "EP/RI"
+        )
+    )
     return df
 
 
 def calcular(df: pd.DataFrame, coluna_nota: str) -> pd.DataFrame:
-    """Agrega as células e calcula a posição relativa dos cursos de TI."""
+    """Agrega as células e calcula a posição ordinal dos cursos."""
     chaves = ["subprograma", "curso", "categoria"]
     t = (
         df.groupby(chaves, as_index=False)
@@ -71,7 +102,19 @@ def calcular(df: pd.DataFrame, coluna_nota: str) -> pd.DataFrame:
     )
     t["tipo_curso"] = np.where(t["eh_ti"], "TI", "Demais cursos")
 
+    ranking = t.groupby(["subprograma", "categoria"])["nota_corte"]
+    t["posicao_nota_corte"] = ranking.rank(method="min", ascending=False).astype("Int64")
+    t["n_cursos_ranking"] = ranking.transform("count").astype("Int64")
+
     calibracao = t[t["tipo_curso"] == "Demais cursos"]
+    resumo_calibracao = (
+        calibracao.groupby(["subprograma", "categoria"], as_index=False)
+        .agg(
+            media_demais_cursos=("nota_corte", "mean"),
+            dp_demais_cursos=("nota_corte", "std"),
+        )
+    )
+    t = t.merge(resumo_calibracao, on=["subprograma", "categoria"], how="left")
     percentis = []
     for row in t[t["eh_ti"]].itertuples(index=False):
         valores = calibracao.loc[
@@ -92,9 +135,9 @@ def calcular(df: pd.DataFrame, coluna_nota: str) -> pd.DataFrame:
         )
     p = pd.DataFrame(percentis)
     t = t.merge(p, on=["subprograma", "curso", "categoria"], how="left")
-    t["categoria_rotulo"] = t["categoria"].map(ROTULOS).fillna(t["categoria"])
+    t["categoria_rotulo"] = t["categoria"].map(ROTULOS_MACRO).fillna(t["categoria"])
     ordem_sub = {s: i for i, s in enumerate(ordem_subprogramas(t["subprograma"]))}
-    ordem_cat = {c: i for i, c in enumerate(CATEGORIAS)}
+    ordem_cat = {c: i for i, c in enumerate(MACROCATEGORIAS)}
     t["_ordem_sub"] = t["subprograma"].map(ordem_sub)
     t["_ordem_cat"] = t["categoria"].map(ordem_cat)
     return t.sort_values(["curso", "_ordem_sub", "_ordem_cat"]).drop(
@@ -106,55 +149,90 @@ def _nome_arquivo(valor: str) -> str:
     return re.sub(r"[^A-Za-z0-9]+", "_", valor).strip("_")
 
 
-def _boxplot(ax, calibracao: pd.DataFrame, categorias: list[str]) -> None:
-    dados = [
-        calibracao.loc[calibracao["categoria"] == categoria, "nota_corte"].to_numpy()
-        for categoria in categorias
-    ]
-    ax.boxplot(
-        dados,
-        positions=np.arange(1, len(categorias) + 1),
-        widths=0.65,
-        patch_artist=True,
-        showfliers=False,
-        boxprops={"facecolor": "#d9d9d9", "edgecolor": "#666666"},
-        medianprops={"color": "#222222", "linewidth": 1.2},
-        whiskerprops={"color": "#666666"},
-        capprops={"color": "#666666"},
-    )
+def _ordinal(valor) -> str:
+    """Formata uma posição inteira como ordinal em português."""
+    return f"{int(valor)}º" if pd.notna(valor) else ""
 
 
 def criar_figura(t: pd.DataFrame, nota_corte: str):
     ti = t[t["eh_ti"]].copy()
-    calibracao = t[~t["eh_ti"]]
     cursos = sorted(ti["curso"].unique())
-    categorias = [c for c in CATEGORIAS if c in t["categoria"].values]
+    categorias = [c for c in MACROCATEGORIAS if c in t["categoria"].values]
     fig, axes = plt.subplots(2, 2, figsize=(18, 11), sharey=True)
     axes = axes.ravel()
-    x = np.arange(1, len(categorias) + 1)
     subs = ordem_subprogramas(t["subprograma"])
-    cores = dict(zip(subs, plt.get_cmap("viridis")(np.linspace(0.1, 0.9, len(subs)))))
+    x = np.arange(len(subs))
+    cores = {categoria: CORES_MACRO[categoria] for categoria in categorias}
 
     for ax, curso in zip(axes, cursos):
-        _boxplot(ax, calibracao, categorias)
         dados_curso = ti[ti["curso"] == curso]
-        for sub in subs:
-            pontos = dados_curso[dados_curso["subprograma"] == sub]
-            if pontos.empty:
-                continue
-            pontos = pontos.set_index("categoria").reindex(categorias).dropna(subset=["nota_corte"])
-            ax.scatter(
-                [x[categorias.index(c)] for c in pontos.index],
-                pontos["nota_corte"],
-                color=cores[sub],
-                s=26,
-                alpha=0.9,
-                label=sub,
-                zorder=3,
+        for categoria in categorias:
+            pontos = (
+                dados_curso[dados_curso["categoria"] == categoria]
+                .set_index("subprograma")
+                .reindex(subs)
             )
+            if pontos["nota_corte"].notna().sum() == 0:
+                continue
+            medias = (
+                t[
+                    (~t["eh_ti"])
+                    & (t["categoria"] == categoria)
+                ]
+                .groupby("subprograma")["nota_corte"]
+                .mean()
+                .reindex(subs)
+            )
+            desvios = (
+                t[
+                    (~t["eh_ti"])
+                    & (t["categoria"] == categoria)
+                ]
+                .groupby("subprograma")["nota_corte"]
+                .std()
+                .reindex(subs)
+                .fillna(0)
+            )
+            faixa_inferior = medias - desvios
+            faixa_superior = medias + desvios
+            valido = medias.notna().to_numpy()
+            if valido.any():
+                ax.fill_between(
+                    x[valido],
+                    faixa_inferior.to_numpy()[valido],
+                    faixa_superior.to_numpy()[valido],
+                    color="#bdbdbd",
+                    alpha=0.12,
+                    linewidth=0,
+                    zorder=0,
+                )
+            linha = ax.plot(
+                x,
+                pontos["nota_corte"],
+                marker="o",
+                linewidth=1.5,
+                markersize=4,
+                color=cores[categoria],
+                label=ROTULOS_MACRO[categoria],
+                zorder=3,
+            )[0]
+            for pos, nota, ordinal in zip(
+                x, pontos["nota_corte"], pontos["posicao_nota_corte"]
+            ):
+                if pd.notna(nota) and pd.notna(ordinal):
+                    ax.annotate(
+                        _ordinal(ordinal),
+                        (pos, nota),
+                        xytext=(0, 5),
+                        textcoords="offset points",
+                        ha="center",
+                        va="bottom",
+                        fontsize=7,
+                        color=linha.get_color(),
+                    )
         ax.set_title(curso, fontsize=10)
         ax.set_xticks(x)
-        ax.set_xticklabels([ROTULOS[c].replace("Sistema Universal (ref.)", "Universal") for c in categorias], rotation=45, ha="right", fontsize=8)
+        ax.set_xticklabels(subs, rotation=45, ha="right", fontsize=8)
         ax.grid(axis="y", alpha=0.25)
         ax.axhline(0, color="#888888", linewidth=0.7)
 
@@ -163,13 +241,22 @@ def criar_figura(t: pd.DataFrame, nota_corte: str):
     axes[0].set_ylabel(f"Nota de corte ({nota_corte})")
     handles, labels = axes[0].get_legend_handles_labels()
     if handles:
-        fig.legend(handles, labels, title="Subprograma", loc="upper center", ncol=5)
+        fig.legend(handles, labels, title="Categoria de cota", loc="upper center", ncol=3)
     fig.suptitle(
-        "Seletividade dos cursos de TI em relação aos demais cursos da UnB",
+        "Posição dos cursos de TI nas notas de corte da UnB",
         y=0.99,
         fontsize=14,
     )
-    fig.tight_layout(rect=(0, 0, 1, 0.94))
+    fig.text(
+        0.5,
+        0.01,
+        "Anotações: posição ordinal entre todos os cursos (1º = maior nota). "
+        "Faixa cinza: média ± 1 desvio-padrão dos demais cursos.",
+        ha="center",
+        fontsize=9,
+        color="#555555",
+    )
+    fig.tight_layout(rect=(0, 0.03, 1, 0.94))
     return fig
 
 
