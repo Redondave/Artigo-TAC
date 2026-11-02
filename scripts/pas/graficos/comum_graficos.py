@@ -6,11 +6,14 @@ que ficam na mesma pasta (o import funciona sem configurar PYTHONPATH).
 Convenção de pastas (relativa à raiz do repositório, que é calculada a partir
 da posição deste arquivo: scripts/pas/graficos/ -> raiz = 3 níveis acima):
     parsed_data/   <- entrada (CSVs do pipeline)
-    results/Fx/    <- saída de cada figura / tabela
+    results/Fx/              <- computação (escopo padrão)
+    results/geral/Fx/        <- todos os cursos
+    results/curso/Fx/<área>/ <- um curso de computação por vez
 """
 from __future__ import annotations
 
 import sys
+import unicodedata
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -61,6 +64,20 @@ COR_GRUPO = {
     "EP Não-PPI": "#7570b3",
 }
 
+# Universal "estrito" = quem só tem classificação no Sistema Universal
+# (`sistema_inscricao == "SU"`, valor que `grupo_concorrencia` chama de
+# "Universal"). Universal "amplo" = todos os candidatos, pois o glossário diz
+# que todo candidato tem classificação em SU, inclusive os cotistas.
+GRUPO_AMPLO = "Universal amplo"
+ROTULO_GRUPO = {
+    "Universal": "Universal estrito (só SU)",
+    "Negros": "Negros",
+    "EP PPI": "EP PPI",
+    "EP Não-PPI": "EP Não-PPI",
+    GRUPO_AMPLO: "Universal amplo (todos)",
+}
+COR_AMPLO = "0.55"
+
 PROVAS = {
     "eb1": "EB1 (Parte I)",
     "eb2": "EB2 (Parte II)",
@@ -76,9 +93,18 @@ COLUNAS_NUMERICAS = ["argumento_final"] + [
 # --------------------------------------------------------------------------
 # Entrada / saída
 # --------------------------------------------------------------------------
-def pasta_saida(nome: str) -> Path:
-    """Cria (se preciso) e devolve results/<nome>."""
-    pasta = RESULTS / nome
+def pasta_saida(nome: str, escopo: str = "computacao", area=None) -> Path:
+    """Cria (se preciso) e devolve a pasta de saída de `nome` (F1, F2, ...):
+        computacao -> results/<nome>
+        geral      -> results/geral/<nome>
+        curso      -> results/curso/<nome>/<área>
+    """
+    if escopo == "geral":
+        pasta = RESULTS / "geral" / nome
+    elif escopo == "curso":
+        pasta = RESULTS / "curso" / nome / str(area)
+    else:
+        pasta = RESULTS / nome
     pasta.mkdir(parents=True, exist_ok=True)
     return pasta
 
@@ -96,13 +122,35 @@ def nome_metrica(coluna: str) -> str:
     return f"{PROVAS[prova]}, {pas}ª etapa"
 
 
-def carregar_alunos(nome: str = TABELA_PADRAO) -> pd.DataFrame:
-    """Lê a tabela 1 e deixa só candidatos de cursos de computação que
-    chegaram à classificação do PAS 3 (único momento em que `sistema_inscricao`
-    existe).
+def grupo_de_cota(valor):
+    """Traduz o texto de `cota_aprovacao` para um dos 4 grupos de
+    `grupo_concorrencia` (Universal, Negros, EP PPI, EP Não-PPI).
+    Devolve None quando não reconhece o valor (ex.: EP sem divisão PPI/não PPI)."""
+    if pd.isna(valor):
+        return None
+    v = unicodedata.normalize("NFKD", str(valor)).encode("ascii", "ignore").decode().upper().strip()
+    if v == "SU" or "UNIVERSAL" in v:
+        return "Universal"
+    if v == "NEG" or "NEGRO" in v:
+        return "Negros"
+    if v.startswith("EP") or "ESCOLA" in v:
+        if "NPPI" in v or "NAO" in v:
+            return "EP Não-PPI"
+        if "PPI" in v:
+            return "EP PPI"
+    return None
 
-    O filtro por `area_computacao` já exclui Eng. de Software nas tabelas
-    `_sem_eng_soft` (o pipeline apaga o rótulo, mantendo as linhas).
+
+def carregar_alunos(nome: str = TABELA_PADRAO, escopo: str = "computacao") -> pd.DataFrame:
+    """Lê a tabela 1 e deixa só candidatos que chegaram à classificação do
+    PAS 3 (único momento em que `sistema_inscricao` existe).
+
+    escopo="computacao" (padrão): só cursos com `area_computacao` preenchida.
+        O filtro já exclui Eng. de Software nas tabelas `_sem_eng_soft` (o
+        pipeline apaga o rótulo, mantendo as linhas).
+    escopo="geral": todos os cursos.
+
+    Também cria `aprovado_bool` (coluna `aprovado` como booleano).
     """
     caminho = PARSED / nome
     if not caminho.exists():
@@ -116,6 +164,9 @@ def carregar_alunos(nome: str = TABELA_PADRAO) -> pd.DataFrame:
             "subprograma": str,
             "area_computacao": str,
             "sistema_inscricao": str,
+            "grupo_concorrencia": str,
+            "cota_aprovacao": str,
+            "curso": str,
         },
     )
     faltando = [
@@ -130,18 +181,43 @@ def carregar_alunos(nome: str = TABELA_PADRAO) -> pd.DataFrame:
     for c in COLUNAS_NUMERICAS:
         df[c] = pd.to_numeric(df[c], errors="coerce")
 
+    if "aprovado" in df.columns:
+        df["aprovado_bool"] = df["aprovado"].astype(str).str.strip().str.lower().eq("true")
+    else:
+        df["aprovado_bool"] = False
+
     n_total = len(df)
-    df = df[df["area_computacao"].notna() & df["sistema_inscricao"].notna()].copy()
+    df = df[df["sistema_inscricao"].notna()].copy()
+    if escopo == "computacao":
+        df = df[df["area_computacao"].notna()].copy()
 
     desconhecidas = set(df["sistema_inscricao"]) - set(CATEGORIAS)
     if desconhecidas:
         print(f"[aviso] sistema_inscricao fora da lista esperada: {sorted(desconhecidas)}")
 
+    onde = "de computação" if escopo == "computacao" else "(todos os cursos)"
     print(
-        f"{nome}: {n_total} linhas -> {len(df)} candidatos de computação "
+        f"{nome}: {n_total} linhas -> {len(df)} candidatos {onde} "
         f"com sistema_inscricao, em {df['subprograma'].nunique()} subprogramas."
     )
     return df
+
+
+def recortes(nome: str = TABELA_PADRAO, escopos=("computacao",)):
+    """Gera (df, escopo, area) para cada escopo pedido, lendo o CSV uma só vez.
+
+    escopos: "computacao" (cursos de computação juntos), "geral" (todos os
+    cursos) e "curso" (um recorte por valor de `area_computacao`).
+    """
+    base = carregar_alunos(nome, "geral")
+    for escopo in escopos:
+        if escopo == "geral":
+            yield base, "geral", None
+        elif escopo == "computacao":
+            yield base[base["area_computacao"].notna()].copy(), "computacao", None
+        elif escopo == "curso":
+            for area in sorted(base["area_computacao"].dropna().unique()):
+                yield base[base["area_computacao"] == area].copy(), "curso", area
 
 
 def indice_lei_14723(subs: list[str], nome: str = SUBPROGRAMAS_PADRAO):

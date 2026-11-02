@@ -1,17 +1,32 @@
 """F2 — Evolução do gap de desempenho em desvios-padrão (d de Cohen).
 
-Compara, subprograma a subprograma, candidatos de computação inscritos em
-alguma cota de escola pública (EP_*) com os do Sistema Universal (SU), em:
-argumento final e em EB1, EB2 e NR de cada etapa.
+Compara, subprograma a subprograma, os candidatos de cotas (Escola Pública e Negros) 
+com os do Universal ESTRITO (`sistema_inscricao == "SU"`, isto é, quem só tem 
+classificação no Sistema Universal), em: argumento final e em EB1, EB2 e NR de cada etapa. 
+Cada candidato entra em UM só grupo (o da categoria mais restritiva em que tem classificação).
 
-Convenção: d = (média SU − média EP) / dp combinado. d > 0 => Universal à frente.
-O grupo EP junta as 8 categorias EP_*; Negros (NEG) fica de fora (ver F3).
+Convenção: d = (média Universal − média Cota) / dp combinado. d > 0 => Universal à frente.
 
 Saída (results/F2/):
-    F2_gap_cohen_d.png / .pdf   figura 2x2 (AF, EB1, EB2, NR)
-    F2_dados.csv                d, IC95% e n por subprograma x medida
+    F2_gap_cohen_d.png / .pdf                figura 2x2 (EP vs Universal estrito)
+    F2_dados.csv                             d, IC95% e n por subprograma x medida (EP)
+    F2_gap_cohen_d_negros.png / .pdf         figura 2x2 (Negros vs Universal estrito)
+    F2_dados_negros.csv                      d, IC95% e n por subprograma x medida (Negros)
+    
+    F2_sensibilidade_universal_amplo.png/.pdf 
+        argumento final: gap contra o Universal estrito (linha cheia) vs. contra o 
+        Universal "amplo" = todos os candidatos, inclusive os próprios cotistas 
+        (linha pontilhada). Mostra o efeito da diluição.
+        
+    exploracao/ (mesmas figuras, mas só com APROVADOS agrupados pela cota da vaga - topo do ranking)
+        F2_gap_cohen_d_aprovados.png/.pdf (+ _dados.csv)
+        F2_gap_cohen_d_aprovados_negros.png/.pdf (+ _dados.csv)
+
+Escopo (--escopo): computacao (padrão; results/F2), geral (todos os cursos;
+results/geral/F2) ou curso (um por área; results/curso/F2/<área>).
 
 Uso:  python scripts/pas/graficos/f2_gap_cohen_d.py [--tabela ARQ.csv] [--sem-ic]
+      [--escopo computacao|geral|curso]
 """
 from __future__ import annotations
 
@@ -24,41 +39,39 @@ import pandas as pd
 from comum_graficos import (
     ETAPAS,
     PROVAS,
+    TABELA_PADRAO,
     aplicar_estilo,
-    carregar_alunos,
     cohen_d,
+    grupo_de_cota,
     indice_lei_14723,
     marcar_lei,
     ordem_subprogramas,
     pasta_saida,
+    recortes,
     salvar,
-    TABELA_PADRAO,
 )
 
 COR_ETAPA = {1: "#1b9e77", 2: "#d95f02", 3: "#7570b3"}
 MARCADOR_ETAPA = {1: "o", 2: "s", 3: "^"}
 
 
-def calcular_gaps(df: pd.DataFrame, subs: list[str]) -> pd.DataFrame:
-    su = df[df["sistema_inscricao"] == "SU"]
-    ep = df[df["sistema_inscricao"].str.startswith("EP_")]
-
-    medidas = [("af", None, "argumento_final")] + [
-        (p, e, f"{p}_pas{e}") for p in PROVAS for e in ETAPAS
-    ]
+def calcular_gaps(ref: pd.DataFrame, ep: pd.DataFrame, subs: list[str], so_af: bool = False) -> pd.DataFrame:
+    """d de Cohen (ref − ep) por subprograma e medida."""
+    medidas = [("af", None, "argumento_final")]
+    if not so_af:
+        medidas += [(p, e, f"{p}_pas{e}") for p in PROVAS for e in ETAPAS]
     linhas = []
     for prova, etapa, col in medidas:
         for sub in subs:
             r = cohen_d(
-                su.loc[su["subprograma"] == sub, col],
+                ref.loc[ref["subprograma"] == sub, col],
                 ep.loc[ep["subprograma"] == sub, col],
             )
             linhas.append({"subprograma": sub, "prova": prova, "etapa": etapa, **r})
-    out = pd.DataFrame(linhas).rename(columns={"n_ref": "n_su", "n_alvo": "n_ep"})
-    return out
+    return pd.DataFrame(linhas).rename(columns={"n_ref": "n_ref", "n_alvo": "n_ep"})
 
 
-def desenhar(gaps: pd.DataFrame, subs: list[str], idx_lei, com_ic: bool):
+def desenhar(gaps, subs, idx_lei, com_ic, ylabel, nota):
     aplicar_estilo()
     fig, axes = plt.subplots(2, 2, figsize=(10, 7), sharex=True, sharey=True)
     paineis = [
@@ -92,37 +105,127 @@ def desenhar(gaps: pd.DataFrame, subs: list[str], idx_lei, com_ic: bool):
     for ax in axes[1]:
         ax.set_xticks(x)
         ax.set_xticklabels(subs, rotation=45, ha="right")
-    fig.supylabel("d de Cohen (Universal − EP)")
+    fig.supylabel(ylabel)
     fig.supxlabel("Subprograma", y=0.0)
-    fig.text(
-        0.5,
-        -0.035,
-        "d > 0: Universal à frente dos cotistas de escola pública. "
-        + ("Faixas: IC 95%." if com_ic else ""),
-        ha="center",
-        fontsize=8,
-        color="0.35",
-    )
+    fig.text(0.5, -0.035, nota + (" Faixas: IC 95%." if com_ic else ""),
+             ha="center", fontsize=8, color="0.35")
     fig.tight_layout()
     return fig
+
+
+def desenhar_sensibilidade(est, amp, subs, idx_lei, com_ic):
+    """Argumento final: gap EP vs. Universal estrito e vs. Universal amplo."""
+    aplicar_estilo()
+    fig, ax = plt.subplots(figsize=(7.5, 4.2))
+    x = np.arange(len(subs))
+    for g, rot, cor, ls, mk in [
+        (est, "contra Universal estrito (só SU)", "black", "-", "o"),
+        (amp, "contra Universal amplo (todos os candidatos)", "0.55", "--", "x"),
+    ]:
+        s = g.set_index("subprograma").reindex(subs)
+        ax.plot(x, s["d"], ls=ls, marker=mk, ms=4, lw=1.6, color=cor, label=rot)
+        if com_ic:
+            ax.fill_between(x, s["ic_inf"], s["ic_sup"], color=cor, alpha=0.10, lw=0)
+    ax.axhline(0, color="0.5", lw=0.8, zorder=0)
+    marcar_lei(ax, idx_lei)
+    ax.set_xticks(x)
+    ax.set_xticklabels(subs, rotation=45, ha="right")
+    ax.set_xlabel("Subprograma")
+    ax.set_ylabel("d de Cohen (referência − EP)")
+    ax.set_title("Argumento final: gap de EP contra duas definições de Universal")
+    ax.legend(fontsize=8, loc="best")
+    fig.text(0.5, -0.04, "O Universal amplo inclui os próprios cotistas EP, o que aproxima as médias e encolhe o gap.",
+             ha="center", fontsize=8, color="0.35")
+    fig.tight_layout()
+    return fig
+
+
+def executar(df: pd.DataFrame, base, com_ic: bool = True) -> None:
+    subs = ordem_subprogramas(df["subprograma"])
+    idx_lei = indice_lei_14723(subs)
+
+    # --- padrão: EP vs Universal estrito (grupos disjuntos) ---
+    su = df[df["sistema_inscricao"] == "SU"]
+    ep = df[df["sistema_inscricao"].str.startswith("EP_")]
+    gaps = calcular_gaps(su, ep, subs)
+    gaps.to_csv(base / "F2_dados.csv", index=False, float_format="%.4f")
+    print("  salvo: F2_dados.csv")
+    fig = desenhar(gaps, subs, idx_lei, com_ic, "d de Cohen (Universal estrito − EP)",
+                   "d > 0: Universal estrito (só SU) à frente dos cotistas de escola pública.")
+    salvar(fig, base, "F2_gap_cohen_d")
+    plt.close(fig)
+
+    # --- padrão: Negros vs Universal estrito ---
+    neg = df[df["sistema_inscricao"] == "NEG"]
+    gaps_neg = calcular_gaps(su, neg, subs)
+    gaps_neg.to_csv(base / "F2_dados_negros.csv", index=False, float_format="%.4f")
+    print("  salvo: F2_dados_negros.csv")
+    fig_neg = desenhar(
+        gaps_neg, 
+        subs, 
+        idx_lei, 
+        com_ic, 
+        "d de Cohen (Universal estrito − Negros)",
+        "d > 0: Universal estrito (só SU) à frente da cota para Negros."
+    )
+    salvar(fig_neg, base, "F2_gap_cohen_d_negros")
+    plt.close(fig_neg)
+
+    # --- sensibilidade: Universal amplo = todos os candidatos ---
+    amp = calcular_gaps(df, ep, subs, so_af=True)
+    fig = desenhar_sensibilidade(gaps[gaps["prova"] == "af"], amp, subs, idx_lei, com_ic)
+    salvar(fig, base, "F2_sensibilidade_universal_amplo")
+    plt.close(fig)
+
+    # --- exploração: aprovados, grupo = cota da vaga ---
+    ap = df[df["aprovado_bool"] & df["cota_aprovacao"].notna()].copy()
+    if ap.empty:
+        print("  [exploração] sem aprovados com cota_aprovacao; pulando.")
+        return
+    ap["_g"] = ap["cota_aprovacao"].map(grupo_de_cota)
+    sem = ap.loc[ap["_g"].isna(), "cota_aprovacao"]
+    if len(sem):
+        print(f"  [exploração] {len(sem)} aprovados com cota_aprovacao não reconhecida "
+              f"(ignorados): {sorted(set(sem))[:8]}")
+    
+    su_a = ap[ap["_g"] == "Universal"]
+    ep_a = ap[ap["_g"].isin(["EP PPI", "EP Não-PPI"])]
+    
+    pasta = base / "exploracao"
+    pasta.mkdir(exist_ok=True)
+    
+    gaps_a = calcular_gaps(su_a, ep_a, subs)
+    gaps_a.to_csv(pasta / "F2_gap_cohen_d_aprovados_dados.csv", index=False, float_format="%.4f")
+    fig = desenhar(gaps_a, subs, idx_lei, com_ic, "d de Cohen (aprovados Universal − aprovados EP)",
+                   "Somente aprovados (convocados), agrupados pela cota da vaga. d > 0: aprovados Universais à frente.")
+    salvar(fig, pasta, "F2_gap_cohen_d_aprovados")
+    plt.close(fig)
+
+    # --- exploração extra: aprovados Negros ---
+    neg_a = ap[ap["_g"] == "Negros"]
+    gaps_neg_a = calcular_gaps(su_a, neg_a, subs)
+    gaps_neg_a.to_csv(pasta / "F2_gap_cohen_d_aprovados_negros_dados.csv", index=False, float_format="%.4f")
+    fig_neg_a = desenhar(
+        gaps_neg_a, 
+        subs, 
+        idx_lei, 
+        com_ic, 
+        "d de Cohen (aprovados Universal − aprovados Negros)",
+        "Somente aprovados (convocados). d > 0: aprovados Universais à frente."
+    )
+    salvar(fig_neg_a, pasta, "F2_gap_cohen_d_aprovados_negros")
+    plt.close(fig_neg_a)
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--tabela", default=TABELA_PADRAO, help="CSV em parsed_data/")
     ap.add_argument("--sem-ic", action="store_true", help="não desenha as faixas de IC95%%")
+    ap.add_argument("--escopo", choices=["computacao", "geral", "curso"], default="computacao")
     args = ap.parse_args()
-
-    df = carregar_alunos(args.tabela)
-    subs = ordem_subprogramas(df["subprograma"])
-    gaps = calcular_gaps(df, subs)
-
-    saida = pasta_saida("F2")
-    gaps.to_csv(saida / "F2_dados.csv", index=False, float_format="%.4f")
-    print(f"  salvo: {(saida / 'F2_dados.csv').relative_to(saida.parents[1])}")
-
-    fig = desenhar(gaps, subs, indice_lei_14723(subs), com_ic=not args.sem_ic)
-    salvar(fig, saida, "F2_gap_cohen_d")
+    for df, escopo, area in recortes(args.tabela, (args.escopo,)):
+        print(f"== F2 | {escopo} {area or ''} ({len(df)} candidatos)")
+        executar(df, pasta_saida("F2", escopo, area), com_ic=not args.sem_ic)
 
 
 if __name__ == "__main__":
