@@ -3,27 +3,20 @@
 Compara, subprograma a subprograma, os candidatos de cotas (Escola Pública e Negros) 
 com os do Universal ESTRITO (`sistema_inscricao == "SU"`, isto é, quem só tem 
 classificação no Sistema Universal), em: argumento final e em EB1, EB2 e NR de cada etapa. 
-Cada candidato entra em UM só grupo (o da categoria mais restritiva em que tem classificação).
 
-Convenção: d = (média Universal − média Cota) / dp combinado. d > 0 => Universal à frente.
-
-Saída (results/F2/):
+Saída (results/computacao/candidatos_geral/F2/):
     F2_gap_cohen_d.png / .pdf                figura 2x2 (EP vs Universal estrito)
     F2_dados.csv                             d, IC95% e n por subprograma x medida (EP)
     F2_gap_cohen_d_negros.png / .pdf         figura 2x2 (Negros vs Universal estrito)
     F2_dados_negros.csv                      d, IC95% e n por subprograma x medida (Negros)
-    
     F2_sensibilidade_universal_amplo.png/.pdf 
-        argumento final: gap contra o Universal estrito (linha cheia) vs. contra o 
-        Universal "amplo" = todos os candidatos, inclusive os próprios cotistas 
-        (linha pontilhada). Mostra o efeito da diluição.
+        argumento final: gap contra o Universal estrito vs. Universal "amplo".
         
-    exploracao/ (mesmas figuras, mas só com APROVADOS agrupados pela cota da vaga - topo do ranking)
-        F2_gap_cohen_d_aprovados.png/.pdf (+ _dados.csv)
-        F2_gap_cohen_d_aprovados_negros.png/.pdf (+ _dados.csv)
+A pasta candidatos_convocados_para_homologacao/F2/ conterá as mesmas figuras,
+mas aplicadas apenas ao topo do ranking.
 
-Escopo (--escopo): computacao (padrão; results/F2), geral (todos os cursos;
-results/geral/F2) ou curso (um por área; results/curso/F2/<área>).
+Escopo (--escopo): computacao (padrão; results/computacao/candidatos_geral/F2), 
+geral (results/geral/...) ou curso (results/por_curso/<área>/...).
 
 Uso:  python scripts/pas/graficos/f2_gap_cohen_d.py [--tabela ARQ.csv] [--sem-ic]
       [--escopo computacao|geral|curso]
@@ -56,7 +49,6 @@ MARCADOR_ETAPA = {1: "o", 2: "s", 3: "^"}
 
 
 def calcular_gaps(ref: pd.DataFrame, ep: pd.DataFrame, subs: list[str], so_af: bool = False) -> pd.DataFrame:
-    """d de Cohen (ref − ep) por subprograma e medida."""
     medidas = [("af", None, "argumento_final")]
     if not so_af:
         medidas += [(p, e, f"{p}_pas{e}") for p in PROVAS for e in ETAPAS]
@@ -114,7 +106,6 @@ def desenhar(gaps, subs, idx_lei, com_ic, ylabel, nota):
 
 
 def desenhar_sensibilidade(est, amp, subs, idx_lei, com_ic):
-    """Argumento final: gap EP vs. Universal estrito e vs. Universal amplo."""
     aplicar_estilo()
     fig, ax = plt.subplots(figsize=(7.5, 4.2))
     x = np.arange(len(subs))
@@ -140,11 +131,12 @@ def desenhar_sensibilidade(est, amp, subs, idx_lei, com_ic):
     return fig
 
 
-def executar(df: pd.DataFrame, base, com_ic: bool = True) -> None:
+def executar(df: pd.DataFrame, escopo: str, area, com_ic: bool = True) -> None:
     subs = ordem_subprogramas(df["subprograma"])
     idx_lei = indice_lei_14723(subs)
 
     # --- padrão: EP vs Universal estrito (grupos disjuntos) ---
+    base = pasta_saida("F2", escopo, area, homologados=False)
     su = df[df["sistema_inscricao"] == "SU"]
     ep = df[df["sistema_inscricao"].str.startswith("EP_")]
     gaps = calcular_gaps(su, ep, subs)
@@ -177,43 +169,42 @@ def executar(df: pd.DataFrame, base, com_ic: bool = True) -> None:
     salvar(fig, base, "F2_sensibilidade_universal_amplo")
     plt.close(fig)
 
-    # --- exploração: aprovados, grupo = cota da vaga ---
+    # --- homologados: grupo = cota da vaga ---
     ap = df[df["aprovado_bool"] & df["cota_aprovacao"].notna()].copy()
     if ap.empty:
-        print("  [exploração] sem aprovados com cota_aprovacao; pulando.")
+        print("  [homologados] sem convocados com cota_aprovacao; pulando.")
         return
     ap["_g"] = ap["cota_aprovacao"].map(grupo_de_cota)
     sem = ap.loc[ap["_g"].isna(), "cota_aprovacao"]
     if len(sem):
-        print(f"  [exploração] {len(sem)} aprovados com cota_aprovacao não reconhecida "
+        print(f"  [homologados] {len(sem)} convocados com cota_aprovacao não reconhecida "
               f"(ignorados): {sorted(set(sem))[:8]}")
     
     su_a = ap[ap["_g"] == "Universal"]
     ep_a = ap[ap["_g"].isin(["EP PPI", "EP Não-PPI"])]
     
-    pasta = base / "exploracao"
-    pasta.mkdir(exist_ok=True)
+    pasta_aprov = pasta_saida("F2", escopo, area, homologados=True)
     
     gaps_a = calcular_gaps(su_a, ep_a, subs)
-    gaps_a.to_csv(pasta / "F2_gap_cohen_d_aprovados_dados.csv", index=False, float_format="%.4f")
-    fig = desenhar(gaps_a, subs, idx_lei, com_ic, "d de Cohen (aprovados Universal − aprovados EP)",
-                   "Somente aprovados (convocados), agrupados pela cota da vaga. d > 0: aprovados Universais à frente.")
-    salvar(fig, pasta, "F2_gap_cohen_d_aprovados")
+    gaps_a.to_csv(pasta_aprov / "F2_gap_cohen_d_homologados_dados.csv", index=False, float_format="%.4f")
+    fig = desenhar(gaps_a, subs, idx_lei, com_ic, "d de Cohen (convocados Universal − convocados EP)",
+                   "Somente convocados para homologação, agrupados pela cota da vaga. d > 0: Universais à frente.")
+    salvar(fig, pasta_aprov, "F2_gap_cohen_d_homologados")
     plt.close(fig)
 
-    # --- exploração extra: aprovados Negros ---
+    # --- homologados extra: convocados Negros ---
     neg_a = ap[ap["_g"] == "Negros"]
     gaps_neg_a = calcular_gaps(su_a, neg_a, subs)
-    gaps_neg_a.to_csv(pasta / "F2_gap_cohen_d_aprovados_negros_dados.csv", index=False, float_format="%.4f")
+    gaps_neg_a.to_csv(pasta_aprov / "F2_gap_cohen_d_homologados_negros_dados.csv", index=False, float_format="%.4f")
     fig_neg_a = desenhar(
         gaps_neg_a, 
         subs, 
         idx_lei, 
         com_ic, 
-        "d de Cohen (aprovados Universal − aprovados Negros)",
-        "Somente aprovados (convocados). d > 0: aprovados Universais à frente."
+        "d de Cohen (convocados Universal − convocados Negros)",
+        "Somente convocados para homologação. d > 0: convocados Universais à frente."
     )
-    salvar(fig_neg_a, pasta, "F2_gap_cohen_d_aprovados_negros")
+    salvar(fig_neg_a, pasta_aprov, "F2_gap_cohen_d_homologados_negros")
     plt.close(fig_neg_a)
 
 
@@ -225,7 +216,7 @@ def main() -> None:
     args = ap.parse_args()
     for df, escopo, area in recortes(args.tabela, (args.escopo,)):
         print(f"== F2 | {escopo} {area or ''} ({len(df)} candidatos)")
-        executar(df, pasta_saida("F2", escopo, area), com_ic=not args.sem_ic)
+        executar(df, escopo, area, com_ic=not args.sem_ic)
 
 
 if __name__ == "__main__":

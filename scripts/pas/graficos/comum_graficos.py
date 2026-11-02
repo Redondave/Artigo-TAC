@@ -6,9 +6,11 @@ que ficam na mesma pasta (o import funciona sem configurar PYTHONPATH).
 Convenção de pastas (relativa à raiz do repositório, que é calculada a partir
 da posição deste arquivo: scripts/pas/graficos/ -> raiz = 3 níveis acima):
     parsed_data/   <- entrada (CSVs do pipeline)
-    results/Fx/              <- computação (escopo padrão)
-    results/geral/Fx/        <- todos os cursos
-    results/curso/Fx/<área>/ <- um curso de computação por vez
+    results/computacao/<grupo>/Fx/       <- computação (escopo padrão)
+    results/geral/<grupo>/Fx/            <- todos os cursos
+    results/por_curso/<área>/<grupo>/Fx/ <- um curso de computação por vez
+    
+    Onde <grupo> é 'candidatos_geral' ou 'candidatos_convocados_para_homologacao'.
 """
 from __future__ import annotations
 
@@ -93,18 +95,21 @@ COLUNAS_NUMERICAS = ["argumento_final"] + [
 # --------------------------------------------------------------------------
 # Entrada / saída
 # --------------------------------------------------------------------------
-def pasta_saida(nome: str, escopo: str = "computacao", area=None) -> Path:
+def pasta_saida(nome: str, escopo: str = "computacao", area=None, homologados: bool = False) -> Path:
     """Cria (se preciso) e devolve a pasta de saída de `nome` (F1, F2, ...):
-        computacao -> results/<nome>
-        geral      -> results/geral/<nome>
-        curso      -> results/curso/<nome>/<área>
+        computacao -> results/computacao/<grupo>/<nome>
+        geral      -> results/geral/<grupo>/<nome>
+        curso      -> results/por_curso/<área>/<grupo>/<nome>
     """
+    grupo = "candidatos_convocados_para_homologacao" if homologados else "candidatos_geral"
+    
     if escopo == "geral":
-        pasta = RESULTS / "geral" / nome
+        pasta = RESULTS / "geral" / grupo / nome
     elif escopo == "curso":
-        pasta = RESULTS / "curso" / nome / str(area)
+        pasta = RESULTS / "por_curso" / str(area) / grupo / nome
     else:
-        pasta = RESULTS / nome
+        pasta = RESULTS / "computacao" / grupo / nome
+        
     pasta.mkdir(parents=True, exist_ok=True)
     return pasta
 

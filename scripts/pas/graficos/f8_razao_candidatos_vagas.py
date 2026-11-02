@@ -1,16 +1,6 @@
 """F8 — Relação entre candidatos e vagas nos cursos de TI.
 
-Gera um gráfico combinado para cada curso de TI. Em cada subprograma, as
-barras mostram inscritos e vagas, separando o Sistema Universal dos sistemas
-de cotas. As linhas mostram a razão inscritos/vagas dos dois grupos no eixo
-secundário.
-
-As células de campus, turno e semestre são somadas por curso, subprograma e
-grupo. A categoria ``DESCONHECIDA`` é excluída, pois não representa um
-sistema de concorrência identificável.
-
-Uso:
-    python scripts/pas/graficos/f8_razao_candidatos_vagas.py
+Saída: results/computacao/candidatos_geral/F8/
 """
 from __future__ import annotations
 
@@ -58,7 +48,6 @@ def _ler_tabela(nome: str) -> pd.DataFrame:
 
 
 def calcular(df: pd.DataFrame) -> pd.DataFrame:
-    """Agrega candidatos e vagas e calcula a razão para cada grupo."""
     t = (
         df.groupby(["subprograma", "curso", "grupo_grafico"], as_index=False)[
             ["vagas", "inscritos"]
@@ -165,7 +154,7 @@ def main() -> None:
     args = ap.parse_args()
 
     dados = calcular(_ler_tabela(args.tabela))
-    saida = pasta_saida("F8")
+    saida = pasta_saida("F8", escopo="computacao", homologados=False)
     dados.to_csv(saida / "F8_dados.csv", index=False, float_format="%.3f")
 
     for curso in sorted(dados["curso"].unique()):

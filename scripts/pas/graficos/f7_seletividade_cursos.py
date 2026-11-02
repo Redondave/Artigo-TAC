@@ -5,13 +5,7 @@ boxplot representa a distribuição das notas de corte dos demais cursos da UnB,
 ao longo dos subprogramas. Os pontos sobrepostos são as notas do curso de TI
 do painel, identificadas pelo subprograma.
 
-Quando existem várias células para o mesmo curso, subprograma e categoria
-(campus, turno ou semestre), a nota usada no gráfico é a mediana dessas
-células. A tabela de saída também informa quantas células foram agregadas.
-
-Uso:
-    python scripts/pas/graficos/f7_seletividade_cursos.py
-    python scripts/pas/graficos/f7_seletividade_cursos.py --nota-corte primeira
+Saída: results/computacao/candidatos_geral/F7/
 """
 from __future__ import annotations
 
@@ -59,7 +53,6 @@ def _ler_tabela(nome: str, coluna_nota: str) -> pd.DataFrame:
 
 
 def calcular(df: pd.DataFrame, coluna_nota: str) -> pd.DataFrame:
-    """Agrega as células e calcula a posição relativa dos cursos de TI."""
     chaves = ["subprograma", "curso", "categoria"]
     t = (
         df.groupby(chaves, as_index=False)
@@ -100,10 +93,6 @@ def calcular(df: pd.DataFrame, coluna_nota: str) -> pd.DataFrame:
     return t.sort_values(["curso", "_ordem_sub", "_ordem_cat"]).drop(
         columns=["_ordem_sub", "_ordem_cat"]
     )
-
-
-def _nome_arquivo(valor: str) -> str:
-    return re.sub(r"[^A-Za-z0-9]+", "_", valor).strip("_")
 
 
 def _boxplot(ax, calibracao: pd.DataFrame, categorias: list[str]) -> None:
@@ -189,7 +178,10 @@ def main() -> None:
         "ultima": "nota_corte_ultima_chamada",
     }[args.nota_corte]
     dados = calcular(_ler_tabela(args.tabela, coluna_nota), coluna_nota)
-    saida = pasta_saida("F7")
+    
+    # Aqui a única mudança real
+    saida = pasta_saida("F7", escopo="computacao", homologados=False)
+    
     dados.to_csv(saida / "F7_dados.csv", index=False, float_format="%.3f")
     dados[dados["eh_ti"]].to_csv(saida / "F7_ti.csv", index=False, float_format="%.3f")
 

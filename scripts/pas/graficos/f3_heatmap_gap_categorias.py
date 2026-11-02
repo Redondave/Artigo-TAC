@@ -1,25 +1,10 @@
 """F3 — Heatmap do gap (d de Cohen) por categoria de concorrência.
 
-Linhas: as 10 categorias de `sistema_inscricao` (SU, NEG e 8 EP_*), onde cada
-candidato aparece em UMA só categoria (a mais restritiva em que tem classificação).
+Linhas: as 10 categorias de `sistema_inscricao` (SU, NEG e 8 EP_*).
 Colunas: subprogramas, em ordem cronológica.
-Célula: d de Cohen entre a referência e a categoria, na medida escolhida
-(padrão: argumento final).  d = (média referência − média categoria) / dp combinado,
-logo d > 0 => referência à frente.
 
-Gera DOIS heatmaps por medida (os dois têm a linha de Cotas para Negros):
-    F3_heatmap_<metrica>                     referência = Universal ESTRITO
-        (candidatos só com classificação no SU). A linha SU é a própria referência
-        e fica em cinza.
-    F3_heatmap_<metrica>_vs_universal_amplo  referência = Universal AMPLO (todos os
-        candidatos, inclusive os cotistas). Serve de sensibilidade; aqui a linha SU
-        (estrito) também é comparada.
-
-Células com menos de --min-n candidatos ficam em cinza com o n escrito, porque d
-com amostras minúsculas é ruído (várias categorias PCD).
-
-Escopo (--escopo): computacao (padrão; results/F3), geral (todos os cursos;
-results/geral/F3) ou curso (um por área; results/curso/F3/<área>).
+Escopo (--escopo): computacao (padrão; results/computacao/candidatos_geral/F3), 
+geral (results/geral/...) ou curso (results/por_curso/<área>/...).
 
 Saída: F3_heatmap_*.png/.pdf e F3_dados_*.csv
 
@@ -53,8 +38,6 @@ from comum_graficos import (
 
 
 def calcular_matriz(df, subs, metrica, min_n, ref="estrito") -> pd.DataFrame:
-    """ref="estrito": referência = só SU (linha SU mascarada).
-    ref="amplo": referência = todos os candidatos (linha SU também é comparada)."""
     referencia = df[df["sistema_inscricao"] == "SU"] if ref == "estrito" else df
     linhas = []
     for cat in CATEGORIAS:
@@ -112,7 +95,6 @@ def desenhar(t, subs, metrica, idx_lei, ref="estrito"):
                 ax.text(j, i, f"{d[i, j]:.2f}\n({n[i, j]})", ha="center", va="center",
                         fontsize=7.5, color=cor)
 
-    # separadores: SU | NEG | EP renda<=lim | EP renda>lim
     for y in (0.5, 1.5, 5.5):
         ax.axhline(y, color="white", lw=3)
     ax.set_xticks(range(nc))
@@ -141,9 +123,10 @@ def desenhar(t, subs, metrica, idx_lei, ref="estrito"):
     return fig
 
 
-def executar(df, base, metrica="argumento_final", min_n=5) -> None:
+def executar(df, escopo, area, metrica="argumento_final", min_n=5) -> None:
     subs = ordem_subprogramas(df["subprograma"])
     idx_lei = indice_lei_14723(subs)
+    base = pasta_saida("F3", escopo, area, homologados=False)
     for ref, sufixo in (("estrito", ""), ("amplo", "_vs_universal_amplo")):
         t = calcular_matriz(df, subs, metrica, min_n, ref)
         csv = base / f"F3_dados_{metrica}{sufixo}.csv"
@@ -163,7 +146,7 @@ def main() -> None:
     args = ap.parse_args()
     for df, escopo, area in recortes(args.tabela, (args.escopo,)):
         print(f"== F3 | {escopo} {area or ''} ({len(df)} candidatos)")
-        executar(df, pasta_saida("F3", escopo, area), args.metrica, args.min_n)
+        executar(df, escopo, area, args.metrica, args.min_n)
 
 
 if __name__ == "__main__":

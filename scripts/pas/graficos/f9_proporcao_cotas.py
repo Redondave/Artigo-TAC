@@ -1,16 +1,6 @@
 """F9 — Proporção de inscritos por categoria de concorrência nos cursos de TI.
 
-Gera um gráfico de linhas para cada curso de TI. Cada linha representa uma
-categoria de concorrência e mostra sua proporção entre os inscritos do curso
-em cada subprograma.
-
-As células de campus, turno e semestre são somadas por curso, subprograma e
-categoria. A categoria ``DESCONHECIDA`` é excluída, pois não representa um
-sistema de concorrência identificável. O denominador é o total de inscritos
-nas dez categorias conhecidas do curso e subprograma.
-
-Uso:
-    python scripts/pas/graficos/f9_proporcao_cotas.py
+Saída: results/computacao/candidatos_geral/F9/
 """
 from __future__ import annotations
 
@@ -58,7 +48,6 @@ def _ler_tabela(nome: str) -> pd.DataFrame:
 
 
 def calcular(df: pd.DataFrame) -> pd.DataFrame:
-    """Calcula a proporção de inscritos em cada categoria."""
     base = (
         df.groupby(["subprograma", "curso", "categoria"], as_index=False)["inscritos"]
         .sum()
@@ -141,7 +130,7 @@ def main() -> None:
     args = ap.parse_args()
 
     dados = calcular(_ler_tabela(args.tabela))
-    saida = pasta_saida("F9")
+    saida = pasta_saida("F9", escopo="computacao", homologados=False)
     dados.to_csv(saida / "F9_dados.csv", index=False, float_format="%.4f")
 
     for curso in sorted(dados["curso"].unique()):

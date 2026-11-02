@@ -1,18 +1,11 @@
 """T1 (Apêndice) — Estatísticas descritivas completas.
 
 Para cada combinação de subprograma x cota x prova x etapa calcula n, média,
-desvio-padrão (amostral, ddof=1) e mediana. Provas: EB1, EB2, NR (etapas 1-3)
-e argumento final (sem etapa). `n` conta só candidatos com a nota preenchida.
+desvio-padrão (amostral, ddof=1) e mediana. 
 
-Cota (--cota):
-    categoria (padrão)  as 10 categorias de `sistema_inscricao`
-    grupo               os 4 grupos de `grupo_concorrencia`
-                        (Universal, Negros, EP PPI, EP Não-PPI)
-Em ambos os casos entra também a linha "Todos" (todos os candidatos do subprograma).
-
-Saída (results/T1/):
+Saída (results/computacao/candidatos_geral/T1/):
     T1_estatisticas_descritivas.csv   formato longo (uma linha por combinação)
-    T1_estatisticas_descritivas.tex   longtable pronta para \\input{} (usa booktabs + longtable)
+    T1_estatisticas_descritivas.tex   longtable pronta para \\input{} 
 
 Uso:  python scripts/pas/graficos/t1_estatisticas_descritivas.py [--cota grupo]
 """
@@ -37,7 +30,6 @@ ORDEM_PROVA = ["Argumento final"] + [PROVAS[p] for p in PROVAS]
 
 
 def calcular(df: pd.DataFrame, coluna_cota: str, ordem_cotas: list[str]) -> pd.DataFrame:
-    # Linha "Todos": duplica o df com a cota rotulada "Todos".
     base = pd.concat([df, df.assign(**{coluna_cota: "Todos"})], ignore_index=True)
 
     medidas = [("Argumento final", None, "argumento_final")] + [
@@ -56,13 +48,12 @@ def calcular(df: pd.DataFrame, coluna_cota: str, ordem_cotas: list[str]) -> pd.D
         partes.append(g)
     t = pd.concat(partes, ignore_index=True)
 
-    # Ordenação: subprograma (cronológica), cota, prova, etapa.
     t["_sub"] = t["subprograma"].map({s: i for i, s in enumerate(ordem_subprogramas(t["subprograma"]))})
     t["_cota"] = t["cota"].map({c: i for i, c in enumerate(ordem_cotas + ["Todos"])})
     t["_prova"] = t["prova"].map({p: i for i, p in enumerate(ORDEM_PROVA)})
     t = t.sort_values(["_sub", "_cota", "_prova", "etapa"], na_position="first")
     t = t.drop(columns=["_sub", "_cota", "_prova"]).reset_index(drop=True)
-    t["etapa"] = t["etapa"].astype("Int64")  # 1/2/3 ou vazio (argumento final)
+    t["etapa"] = t["etapa"].astype("Int64")
     return t
 
 
@@ -112,7 +103,7 @@ def main() -> None:
 
     t = calcular(df, coluna, ordem)
 
-    saida = pasta_saida("T1")
+    saida = pasta_saida("T1", homologados=False)
     t.to_csv(saida / "T1_estatisticas_descritivas.csv", index=False, float_format="%.3f")
     (saida / "T1_estatisticas_descritivas.tex").write_text(para_latex(t), encoding="utf-8")
     print(f"  {len(t)} linhas salvas em {saida}")
