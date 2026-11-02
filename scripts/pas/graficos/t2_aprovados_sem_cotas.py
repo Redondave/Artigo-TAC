@@ -1,22 +1,6 @@
 """T2 — Simulação de aprovação sem cotas para os cursos de TI.
 
-Para cada curso e subprograma, os candidatos são ordenados pelo
-``argumento_final`` (maior para menor). Os primeiros ``N`` candidatos, em que
-``N`` é a soma das vagas do curso na tabela 2, são tratados como aprovados
-num cenário sem cotas. A tabela resultante informa quantas dessas vagas seriam
-ocupadas por candidatos de cada grupo de concorrência.
-
-Por padrão são processados os três últimos subprogramas disponíveis. Essa
-seleção pode ser alterada com ``--ultimos N`` ou substituída por uma lista
-explícita com ``--subprogramas 21-23 22-24 23-25``.
-
-Saída (``results/T2/``):
-    ``<subprograma>/T2_<curso>.csv``: uma tabela para cada curso;
-    ``T2_resumo.csv``: todas as tabelas em formato longo.
-
-Uso:
-    python scripts/pas/graficos/t2_aprovados_sem_cotas.py
-    python scripts/pas/graficos/t2_aprovados_sem_cotas.py --ultimos 5
+Saída: results/computacao/candidatos_geral/T2/
 """
 from __future__ import annotations
 
@@ -35,7 +19,6 @@ TABELA_VAGAS_PADRAO = "tabela2_curso_cota_sem_14_16.csv"
 
 
 def _nome_arquivo(valor: str) -> str:
-    """Converte o nome do curso em um nome de arquivo estável e legível."""
     nome = re.sub(r"[^A-Za-z0-9]+", "_", str(valor)).strip("_")
     return nome or "curso_sem_nome"
 
@@ -73,7 +56,6 @@ def _selecionar_subprogramas(
 def calcular(
     alunos: pd.DataFrame, vagas: pd.DataFrame, subprogramas: list[str]
 ) -> pd.DataFrame:
-    """Calcula a ocupação simulada das vagas por grupo de concorrência."""
     alunos = alunos[
         alunos["subprograma"].isin(subprogramas)
         & alunos["curso"].notna()
@@ -162,7 +144,8 @@ def main() -> None:
     subprogramas = _selecionar_subprogramas(alunos, args.ultimos, args.subprogramas)
     resultado = calcular(alunos, _ler_vagas(args.tabela_vagas), subprogramas)
 
-    saida = pasta_saida("T2")
+    saida = pasta_saida("T2", escopo="computacao", homologados=False)
+    
     for subprograma, por_subprograma in resultado.groupby("subprograma", sort=False):
         pasta = saida / subprograma
         pasta.mkdir(parents=True, exist_ok=True)

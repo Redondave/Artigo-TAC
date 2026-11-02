@@ -1,231 +1,153 @@
-"""Utilidades compartilhadas pelos scripts de figuras e tabelas do artigo.
+"""F3 — Heatmap do gap (d de Cohen) por categoria de concorrência.
 
-Não é executado diretamente: é importado por f2_*.py, f3_*.py e t1_*.py,
-que ficam na mesma pasta (o import funciona sem configurar PYTHONPATH).
+Linhas: as 10 categorias de `sistema_inscricao` (SU, NEG e 8 EP_*).
+Colunas: subprogramas, em ordem cronológica.
 
-Convenção de pastas (relativa à raiz do repositório, que é calculada a partir
-da posição deste arquivo: scripts/pas/graficos/ -> raiz = 3 níveis acima):
-    parsed_data/   <- entrada (CSVs do pipeline)
-    results/Fx/    <- saída de cada figura / tabela
+Escopo (--escopo): computacao (padrão; results/computacao/candidatos_geral/F3), 
+geral (results/geral/...) ou curso (results/por_curso/<área>/...).
+
+Saída: F3_heatmap_*.png/.pdf e F3_dados_*.csv
+
+Uso:  python scripts/pas/graficos/f3_heatmap_gap_categorias.py
+      [--metrica argumento_final|eb1_pas3|nr_pas2|...] [--min-n 5] [--tabela ARQ.csv]
+      [--escopo computacao|geral|curso]
 """
 from __future__ import annotations
 
-import sys
-from pathlib import Path
+import argparse
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-RAIZ = Path(__file__).resolve().parents[3]
-PARSED = RAIZ / "parsed_data"
-RESULTS = RAIZ / "results"
-
-TABELA_PADRAO = "tabela1_alunos_sem_eng_soft.csv"
-SUBPROGRAMAS_PADRAO = "subprogramas_sem_eng_soft.csv"
-
-# Ordem de exibição: referência, Negros, depois EP por renda (R1 -> R2),
-# raça (PPI -> NPPI) e deficiência (PCD logo após a categoria geral).
-CATEGORIAS = [
-    "SU",
-    "NEG",
-    "EP_R1_PPI",
-    "EP_R1_PPI_PCD",
-    "EP_R1_NPPI",
-    "EP_R1_NPPI_PCD",
-    "EP_R2_PPI",
-    "EP_R2_PPI_PCD",
-    "EP_R2_NPPI",
-    "EP_R2_NPPI_PCD",
-]
-
-ROTULOS = {
-    "SU": "Sistema Universal (ref.)",
-    "NEG": "Cotas para Negros",
-    "EP_R1_PPI": "EP, renda ≤ lim., PPI",
-    "EP_R1_PPI_PCD": "EP, renda ≤ lim., PPI, PCD",
-    "EP_R1_NPPI": "EP, renda ≤ lim., não PPI",
-    "EP_R1_NPPI_PCD": "EP, renda ≤ lim., não PPI, PCD",
-    "EP_R2_PPI": "EP, renda > lim., PPI",
-    "EP_R2_PPI_PCD": "EP, renda > lim., PPI, PCD",
-    "EP_R2_NPPI": "EP, renda > lim., não PPI",
-    "EP_R2_NPPI_PCD": "EP, renda > lim., não PPI, PCD",
-}
-
-# Agrupamentos de `grupo_concorrencia` (linhas da F1) e cores fixas por grupo.
-GRUPOS = ["Universal", "Negros", "EP PPI", "EP Não-PPI"]
-COR_GRUPO = {
-    "Universal": "#222222",
-    "Negros": "#d95f02",
-    "EP PPI": "#1b9e77",
-    "EP Não-PPI": "#7570b3",
-}
-
-PROVAS = {
-    "eb1": "EB1 (Parte I)",
-    "eb2": "EB2 (Parte II)",
-    "nr": "NR (redação)",
-}
-ETAPAS = (1, 2, 3)
-
-COLUNAS_NUMERICAS = ["argumento_final"] + [
-    f"{p}_pas{e}" for p in PROVAS for e in ETAPAS
-]
+from comum_graficos import (
+    CATEGORIAS,
+    COLUNAS_NUMERICAS,
+    ROTULOS,
+    TABELA_PADRAO,
+    aplicar_estilo,
+    cohen_d,
+    indice_lei_14723,
+    marcar_lei,
+    nome_metrica,
+    ordem_subprogramas,
+    pasta_saida,
+    recortes,
+    salvar,
+)
 
 
-# --------------------------------------------------------------------------
-# Entrada / saída
-# --------------------------------------------------------------------------
-def pasta_saida(nome: str) -> Path:
-    """Cria (se preciso) e devolve results/<nome>."""
-    pasta = RESULTS / nome
-    pasta.mkdir(parents=True, exist_ok=True)
-    return pasta
-
-
-def ordem_subprogramas(valores) -> list[str]:
-    """Ordena '15-17', '16-18', ... pelo ano inicial (não alfabeticamente)."""
-    return sorted(set(map(str, valores)), key=lambda s: int(s.split("-")[0]))
-
-
-def nome_metrica(coluna: str) -> str:
-    """'eb2_pas3' -> 'EB2 (Parte II), 3ª etapa'; 'argumento_final' -> 'Argumento final'."""
-    if coluna == "argumento_final":
-        return "Argumento final"
-    prova, pas = coluna.split("_pas")
-    return f"{PROVAS[prova]}, {pas}ª etapa"
-
-
-def carregar_alunos(nome: str = TABELA_PADRAO) -> pd.DataFrame:
-    """Lê a tabela 1 e deixa só candidatos de cursos de computação que
-    chegaram à classificação do PAS 3 (único momento em que `sistema_inscricao`
-    existe).
-
-    O filtro por `area_computacao` já exclui Eng. de Software nas tabelas
-    `_sem_eng_soft` (o pipeline apaga o rótulo, mantendo as linhas).
-    """
-    caminho = PARSED / nome
-    if not caminho.exists():
-        sys.exit(f"Arquivo não encontrado: {caminho}")
-
-    df = pd.read_csv(
-        caminho,
-        low_memory=False,
-        dtype={
-            "id_aluno": str,
-            "subprograma": str,
-            "area_computacao": str,
-            "sistema_inscricao": str,
-        },
+def calcular_matriz(df, subs, metrica, min_n, ref="estrito") -> pd.DataFrame:
+    referencia = df[df["sistema_inscricao"] == "SU"] if ref == "estrito" else df
+    linhas = []
+    for cat in CATEGORIAS:
+        dcat = df[df["sistema_inscricao"] == cat]
+        for sub in subs:
+            a = referencia.loc[referencia["subprograma"] == sub, metrica]
+            b = dcat.loc[dcat["subprograma"] == sub, metrica]
+            if cat == "SU" and ref == "estrito":
+                r = {"d": np.nan, "n_ref": a.notna().sum(), "n_alvo": a.notna().sum()}
+            else:
+                r = cohen_d(a, b)
+            linhas.append({"categoria": cat, "subprograma": sub, **r})
+    t = pd.DataFrame(linhas).rename(columns={"n_ref": "n_ref", "n_alvo": "n_categoria"})
+    t["mascarada"] = (
+        ((t["categoria"] == "SU") & (ref == "estrito"))
+        | t["d"].isna()
+        | (t["n_categoria"] < min_n)
+        | (t["n_ref"] < min_n)
     )
-    faltando = [
-        c
-        for c in ["subprograma", "area_computacao", "sistema_inscricao"]
-        + COLUNAS_NUMERICAS
-        if c not in df.columns
-    ]
-    if faltando:
-        sys.exit(f"Colunas ausentes em {nome}: {faltando}")
+    return t
 
-    for c in COLUNAS_NUMERICAS:
-        df[c] = pd.to_numeric(df[c], errors="coerce")
 
-    n_total = len(df)
-    df = df[df["area_computacao"].notna() & df["sistema_inscricao"].notna()].copy()
+def desenhar(t, subs, metrica, idx_lei, ref="estrito"):
+    aplicar_estilo()
+    nl, nc = len(CATEGORIAS), len(subs)
 
-    desconhecidas = set(df["sistema_inscricao"]) - set(CATEGORIAS)
-    if desconhecidas:
-        print(f"[aviso] sistema_inscricao fora da lista esperada: {sorted(desconhecidas)}")
+    d = np.full((nl, nc), np.nan)
+    n = np.zeros((nl, nc), dtype=int)
+    mask = np.ones((nl, nc), dtype=bool)
+    for _, r in t.iterrows():
+        i, j = CATEGORIAS.index(r["categoria"]), subs.index(r["subprograma"])
+        d[i, j] = r["d"]
+        n[i, j] = r["n_categoria"]
+        mask[i, j] = r["mascarada"]
 
-    print(
-        f"{nome}: {n_total} linhas -> {len(df)} candidatos de computação "
-        f"com sistema_inscricao, em {df['subprograma'].nunique()} subprogramas."
+    visivel = np.ma.masked_array(d, mask=mask | np.isnan(d))
+    lim = max(0.5, float(np.ceil(np.nanmax(np.abs(visivel.filled(np.nan))) * 4) / 4)) if (~visivel.mask).any() else 1.0
+
+    cmap = plt.get_cmap("RdBu_r").copy()
+    cmap.set_bad("#ececec")
+
+    fig, ax = plt.subplots(figsize=(1.0 * nc + 4.2, 0.62 * nl + 1.8))
+    im = ax.imshow(visivel, cmap=cmap, vmin=-lim, vmax=lim, aspect="auto")
+
+    for i in range(nl):
+        for j in range(nc):
+            if CATEGORIAS[i] == "SU" and ref == "estrito":
+                ax.text(j, i, f"ref.\n({n[i, j]})", ha="center", va="center",
+                        fontsize=7, color="0.45", style="italic")
+            elif mask[i, j]:
+                txt = "–" if n[i, j] == 0 else f"n={n[i, j]}"
+                ax.text(j, i, txt, ha="center", va="center", fontsize=7, color="0.45")
+            else:
+                cor = "white" if abs(d[i, j]) > 0.6 * lim else "black"
+                ax.text(j, i, f"{d[i, j]:.2f}\n({n[i, j]})", ha="center", va="center",
+                        fontsize=7.5, color=cor)
+
+    for y in (0.5, 1.5, 5.5):
+        ax.axhline(y, color="white", lw=3)
+    ax.set_xticks(range(nc))
+    ax.set_xticklabels(subs, rotation=45, ha="right")
+    ax.set_yticks(range(nl))
+    rot = dict(ROTULOS)
+    rot["SU"] = "Universal estrito (ref.)" if ref == "estrito" else "Universal estrito (só SU)"
+    ax.set_yticklabels([rot[c] for c in CATEGORIAS])
+    for lado in ax.spines.values():
+        lado.set_visible(False)
+    ax.tick_params(length=0)
+    marcar_lei(ax, idx_lei)
+    ax.set_xlabel("Subprograma")
+    nome_ref = "Universal estrito (só SU)" if ref == "estrito" else "Universal amplo (todos os candidatos)"
+    ax.set_title(f"Gap em relação ao {nome_ref} — {nome_metrica(metrica)}")
+
+    cb = fig.colorbar(im, ax=ax, pad=0.02, fraction=0.04)
+    cb.set_label("d de Cohen (referência − categoria)")
+    fig.text(
+        0.01, -0.02,
+        "Valor (n): d e nº de candidatos na categoria. Cinza: referência ou n < mínimo. Cada candidato conta em uma só linha.\n"
+        "d > 0: referência à frente. 'lim.' = limite de renda (1,5 SM até 21-23; 1 SM desde 22-24).",
+        fontsize=7.5, color="0.35", va="top",
     )
-    return df
+    fig.tight_layout()
+    return fig
 
 
-def indice_lei_14723(subs: list[str], nome: str = SUBPROGRAMAS_PADRAO):
-    """Posição (em `subs`) do primeiro subprograma sob a Lei 14.723/2023,
-    lida da coluna `lei_14723` de subprogramas*.csv. None se não achar."""
-    caminho = PARSED / nome
-    if not caminho.exists():
-        return None
-    t = pd.read_csv(caminho, dtype=str)
-    if "lei_14723" not in t.columns:
-        return None
-    sob_lei = set(
-        t.loc[t["lei_14723"].str.strip().str.lower() == "true", "subprograma"]
-    )
-    for i, s in enumerate(subs):
-        if s in sob_lei:
-            return i
-    return None
+def executar(df, escopo, area, metrica="argumento_final", min_n=5) -> None:
+    subs = ordem_subprogramas(df["subprograma"])
+    idx_lei = indice_lei_14723(subs)
+    base = pasta_saida("F3", escopo, area, homologados=False)
+    for ref, sufixo in (("estrito", ""), ("amplo", "_vs_universal_amplo")):
+        t = calcular_matriz(df, subs, metrica, min_n, ref)
+        csv = base / f"F3_dados_{metrica}{sufixo}.csv"
+        t.to_csv(csv, index=False, float_format="%.4f")
+        print(f"  salvo: {csv.name}")
+        fig = desenhar(t, subs, metrica, idx_lei, ref)
+        salvar(fig, base, f"F3_heatmap_{metrica}{sufixo}")
+        plt.close(fig)
 
 
-# --------------------------------------------------------------------------
-# Estatística
-# --------------------------------------------------------------------------
-def cohen_d(ref, alvo) -> dict:
-    """d de Cohen com desvio-padrão combinado e IC 95% (aproximação normal).
-
-        d = (média_ref − média_alvo) / dp_combinado
-
-    Sinal: d > 0 significa que o grupo de referência (Sistema Universal) está
-    à frente do grupo-alvo (cotistas). NaNs são descartados antes do cálculo.
-    Com n < 2 em algum dos grupos (ou variância nula) devolve d = NaN.
-    """
-    a = pd.to_numeric(pd.Series(ref), errors="coerce").dropna().to_numpy(float)
-    b = pd.to_numeric(pd.Series(alvo), errors="coerce").dropna().to_numpy(float)
-    n1, n2 = len(a), len(b)
-    out = {"d": np.nan, "ic_inf": np.nan, "ic_sup": np.nan, "n_ref": n1, "n_alvo": n2}
-    if n1 < 2 or n2 < 2:
-        return out
-    sp = np.sqrt(((n1 - 1) * a.var(ddof=1) + (n2 - 1) * b.var(ddof=1)) / (n1 + n2 - 2))
-    if sp == 0:
-        return out
-    d = (a.mean() - b.mean()) / sp
-    ep = np.sqrt((n1 + n2) / (n1 * n2) + d**2 / (2 * (n1 + n2)))
-    out.update(d=d, ic_inf=d - 1.96 * ep, ic_sup=d + 1.96 * ep)
-    return out
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--tabela", default=TABELA_PADRAO, help="CSV em parsed_data/")
+    ap.add_argument("--metrica", default="argumento_final", choices=COLUNAS_NUMERICAS)
+    ap.add_argument("--min-n", type=int, default=5, help="n mínimo por célula (padrão 5)")
+    ap.add_argument("--escopo", choices=["computacao", "geral", "curso"], default="computacao")
+    args = ap.parse_args()
+    for df, escopo, area in recortes(args.tabela, (args.escopo,)):
+        print(f"== F3 | {escopo} {area or ''} ({len(df)} candidatos)")
+        executar(df, escopo, area, args.metrica, args.min_n)
 
 
-# --------------------------------------------------------------------------
-# Gráficos
-# --------------------------------------------------------------------------
-def aplicar_estilo() -> None:
-    plt.rcParams.update(
-        {
-            "font.size": 10,
-            "axes.spines.top": False,
-            "axes.spines.right": False,
-            "axes.titlesize": 11,
-            "legend.frameon": False,
-            "figure.dpi": 110,
-            "savefig.bbox": "tight",
-        }
-    )
-
-
-def marcar_lei(ax, idx) -> None:
-    """Linha vertical entre o último subprograma antes e o primeiro sob a Lei 14.723."""
-    if idx is None or idx == 0:
-        return
-    ax.axvline(idx - 0.5, ls="--", lw=1, color="0.35", zorder=0)
-    ax.text(
-        idx - 0.42,
-        0.98,
-        "Lei 14.723/2023",
-        transform=ax.get_xaxis_transform(),
-        va="top",
-        ha="left",
-        fontsize=7,
-        color="0.35",
-    )
-
-
-def salvar(fig, pasta: Path, nome: str) -> None:
-    """Salva PNG (300 dpi) e PDF (vetorial, para o LaTeX)."""
-    for ext in ("png", "pdf"):
-        caminho = pasta / f"{nome}.{ext}"
-        fig.savefig(caminho, dpi=300)
-        print(f"  salvo: {caminho.relative_to(RAIZ)}")
+if __name__ == "__main__":
+    main()

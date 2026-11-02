@@ -1,35 +1,36 @@
 """F1 — Evolução do escore bruto médio por componente.
 
 Gera 3 figuras separadas: EB1, EB2 e NR (nota da redação). Cada figura tem 3
-painéis empilhados (PAS 1, PAS 2, PAS 3) com eixo y compartilhado e eixo x
-compartilhado em datas de aplicação da prova, e 4 linhas de grupos de
-concorrência: Universal, Negros, EP PPI, EP Não-PPI (`grupo_concorrencia`).
-Faixa = IC 95% da média (média ± 1,96 · dp / √n).
+painéis empilhados (PAS 1, PAS 2, PAS 3), com eixos x (data de aplicação da
+prova) e y compartilhados, e uma linha por grupo de concorrência. Faixa = IC 95%
+da média (média ± 1,96 · dp / √n).
 
-DATAS DAS PROVAS (eixo x), lidas de parsed_data/subprogramas*.csv:
-    data_prova_pas3            existe no glossário; usada como está.
-    data_prova_pas1/_pas2      OPCIONAIS. Se a coluna não existir (ou estiver
-                               vazia num subprograma), a data é APROXIMADA como
-                               a do PAS 3 menos 2 anos (PAS 1) e menos 1 ano
-                               (PAS 2). O script avisa quando isso acontece.
-                               Para datas exatas, adicione essas colunas.
-Formatos aceitos: AAAA-MM-DD ou DD/MM/AAAA.
+LINHAS (cada candidato entra em UM só grupo: o de `sistema_inscricao`, que é a
+categoria mais restritiva em que ele tem classificação):
+    Universal estrito (só SU)   quem só tem classificação no Sistema Universal
+    Negros, EP PPI, EP Não-PPI  demais grupos (`grupo_concorrencia`)
+    Universal amplo (todos)     linha de referência pontilhada: TODOS os
+                                candidatos, já que todo mundo tem classificação
+                                no SU (inclui os cotistas). Serve para mostrar o
+                                efeito de usar o Universal "diluído".
 
-ATENÇÃO — quem entra nas médias: `grupo_concorrencia` só existe para quem chegou
-à classificação do PAS 3. Logo, as médias dos painéis PAS 1 e PAS 2 são dos
-candidatos que continuaram até o PAS 3 (não de todos que fizeram a 1ª/2ª etapa).
+DATAS: as datas exatas de aplicação estão na tabela DATAS_PROVAS abaixo.
+Datas atípicas (calendário alterado pela pandemia) levam "*" no rótulo.
 
-Saída (results/F1/):
-    F1_eb1.png/.pdf, F1_eb2.png/.pdf, F1_nr.png/.pdf
-    F1_dados.csv   n, média, dp, IC95% e data usada, por prova x etapa x subprograma x grupo
+A pasta candidatos_convocados_para_homologacao/ terá as mesmas figuras, mas 
+só com convocados e agrupados pela cota da vaga (`cota_aprovacao`).
+
+Escopo (--escopo): computacao (padrão; results/computacao/candidatos_geral/F1), 
+geral (results/geral/...) ou curso (results/por_curso/<área>/...).
+
+Saída: F1_eb1/eb2/nr .png/.pdf e F1_dados.csv
 
 Uso:  python scripts/pas/graficos/f1_escore_medio_componente.py [--sem-ic]
-      [--tabela ARQ.csv] [--subprogramas ARQ.csv]
+      [--escopo computacao|geral|curso] [--tabela ARQ.csv]
 """
 from __future__ import annotations
 
 import argparse
-import sys
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
@@ -37,138 +38,158 @@ import numpy as np
 import pandas as pd
 
 from comum_graficos import (
+    COR_AMPLO,
     COR_GRUPO,
     ETAPAS,
+    GRUPO_AMPLO,
     GRUPOS,
-    PARSED,
     PROVAS,
-    SUBPROGRAMAS_PADRAO,
+    ROTULO_GRUPO,
     TABELA_PADRAO,
     aplicar_estilo,
-    carregar_alunos,
-    ordem_subprogramas,
+    grupo_de_cota,
     pasta_saida,
+    recortes,
     salvar,
 )
 
-MARCADOR = {"Universal": "o", "Negros": "s", "EP PPI": "^", "EP Não-PPI": "D"}
+DATAS_PROVAS = {
+    "15-17": ("2015-12-06", "2016-12-03", "2017-12-03"),
+    "16-18": ("2016-12-04", "2017-12-02", "2018-12-09"),
+    "17-19": ("2017-12-03", "2018-12-09", "2019-12-01"),
+    "18-20": ("2018-12-09", "2019-12-01", "2021-07-18"),
+    "19-21": ("2019-12-01", "2021-06-20", "2022-01-30"),
+    "20-22": ("2021-06-27", "2022-02-13", "2022-12-11"),
+    "21-23": ("2022-02-20", "2022-12-10", "2023-12-17"),
+    "22-24": ("2022-12-17", "2023-12-10", "2024-12-01"),
+    "23-25": ("2023-12-03", "2024-12-08", "2025-11-30"),
+}
+ATIPICAS = {("18-20", 3), ("19-21", 2), ("19-21", 3), ("20-22", 1), ("20-22", 2), ("21-23", 1)}
+
+DATAS = {
+    (sub, etapa): pd.Timestamp(d)
+    for sub, ds in DATAS_PROVAS.items()
+    for etapa, d in zip(ETAPAS, ds)
+}
+
+MARCADOR = {"Universal": "o", "Negros": "s", "EP PPI": "^", "EP Não-PPI": "D", GRUPO_AMPLO: "x"}
 YLABEL = {"eb1": "Escore bruto médio — EB1", "eb2": "Escore bruto médio — EB2", "nr": "Nota média da redação (0–10)"}
 
-
-def _parse_datas(s: pd.Series) -> pd.Series:
-    """AAAA-MM-DD primeiro; o que sobrar tenta DD/MM/AAAA."""
-    out = pd.to_datetime(s, format="%Y-%m-%d", errors="coerce")
-    resto = out.isna() & s.notna()
-    if resto.any():
-        out[resto] = pd.to_datetime(s[resto], dayfirst=True, errors="coerce")
-    return out
+ROTULO_HOMOLOGADOS = {
+    "Universal": "Convocados em vaga Universal",
+    "Negros": "Convocados em cota Negros",
+    "EP PPI": "Convocados em cota EP PPI",
+    "EP Não-PPI": "Convocados em cota EP Não-PPI",
+}
 
 
-def carregar_datas(nome: str):
-    """Devolve ({etapa: Series indexada por subprograma}, etapas_aproximadas)."""
-    caminho = PARSED / nome
-    if not caminho.exists():
-        sys.exit(f"Arquivo não encontrado: {caminho}")
-    t = pd.read_csv(caminho, dtype=str).set_index("subprograma")
-    if "data_prova_pas3" not in t.columns:
-        sys.exit(f"Coluna data_prova_pas3 ausente em {nome}")
-
-    datas = {}
-    for e in ETAPAS:
-        col = f"data_prova_pas{e}"
-        datas[e] = _parse_datas(t[col]) if col in t.columns else pd.Series(pd.NaT, index=t.index, dtype="datetime64[ns]")
-
-    aproximadas = []
-    for etapa, anos in ((1, 2), (2, 1)):
-        falta = datas[etapa].isna() & datas[3].notna()
-        if falta.any():
-            datas[etapa][falta] = datas[3][falta] - pd.DateOffset(years=anos)
-            aproximadas.append(etapa)
-    if aproximadas:
-        print(
-            f"[aviso] datas do PAS {aproximadas} aproximadas como (data do PAS 3 − "
-            "2 anos / − 1 ano). Para datas exatas, adicione data_prova_pas1/_pas2 "
-            f"em {nome}."
-        )
-    sem = [s for s in t.index if pd.isna(datas[3].get(s))]
-    if sem:
-        print(f"[aviso] subprogramas sem data_prova_pas3 (ficam fora da F1): {sem}")
-    return datas, aproximadas
-
-
-def calcular(df: pd.DataFrame, datas: dict, subs: list[str]) -> pd.DataFrame:
+def calcular(base: pd.DataFrame, subs_validas: list[str]) -> pd.DataFrame:
     partes = []
     for prova in PROVAS:
         for etapa in ETAPAS:
             col = f"{prova}_pas{etapa}"
             g = (
-                df.groupby(["subprograma", "grupo_concorrencia"])[col]
+                base.groupby(["subprograma", "_g"])[col]
                 .agg(n="count", media="mean", dp="std")
                 .reset_index()
-                .rename(columns={"grupo_concorrencia": "grupo"})
+                .rename(columns={"_g": "grupo"})
             )
             ep = 1.96 * g["dp"] / np.sqrt(g["n"].where(g["n"] > 1))
             g["ic_inf"], g["ic_sup"] = g["media"] - ep, g["media"] + ep
-            g["data"] = g["subprograma"].map(datas[etapa])
+            g["data"] = [DATAS.get((s, etapa)) for s in g["subprograma"]]
             g.insert(0, "etapa", etapa)
             g.insert(0, "prova", prova)
             partes.append(g)
-    return pd.concat(partes, ignore_index=True)
+    t = pd.concat(partes, ignore_index=True)
+    fora = sorted(set(t.loc[t["data"].isna(), "subprograma"]))
+    if fora:
+        print(f"[aviso] subprogramas sem data em DATAS_PROVAS (ficam fora): {fora}")
+    return t
 
 
-def desenhar(t: pd.DataFrame, prova: str, com_ic: bool, aproximadas: list[int]):
+def desenhar(t, prova, com_ic, grupos, rotulos, nota):
     aplicar_estilo()
     fig, axes = plt.subplots(3, 1, figsize=(9, 8.8), sharex=True, sharey=True)
     for ax, etapa in zip(axes, ETAPAS):
-        for grupo in GRUPOS:
+        for grupo in grupos:
             s = t[(t["prova"] == prova) & (t["etapa"] == etapa) & (t["grupo"] == grupo)]
             s = s.dropna(subset=["data"]).sort_values("data")
+            if grupo == GRUPO_AMPLO:
+                ax.plot(s["data"], s["media"], marker="x", ms=4, lw=1.3, ls="--",
+                        color=COR_AMPLO, label=rotulos[grupo])
+                continue
             cor = COR_GRUPO[grupo]
-            ax.plot(s["data"], s["media"], marker=MARCADOR[grupo], ms=4, lw=1.6, color=cor, label=grupo)
+            ax.plot(s["data"], s["media"], marker=MARCADOR[grupo], ms=4, lw=1.6,
+                    color=cor, label=rotulos[grupo])
             if com_ic:
                 ax.fill_between(s["data"], s["ic_inf"], s["ic_sup"], color=cor, alpha=0.10, lw=0)
-        # rótulo do subprograma de cada aplicação, na base do painel
-        for _, r in t[(t["prova"] == prova) & (t["etapa"] == etapa)].drop_duplicates("subprograma").dropna(subset=["data"]).iterrows():
-            ax.text(r["data"], 0.02, r["subprograma"], transform=ax.get_xaxis_transform(),
+        
+        ref = t[(t["prova"] == prova) & (t["etapa"] == etapa)].drop_duplicates("subprograma").dropna(subset=["data"])
+        for _, r in ref.iterrows():
+            marca = "*" if (r["subprograma"], etapa) in ATIPICAS else ""
+            ax.text(r["data"], 0.02, r["subprograma"] + marca, transform=ax.get_xaxis_transform(),
                     rotation=90, ha="center", va="bottom", fontsize=6, color="0.5")
-        sufixo = " (datas aproximadas)" if etapa in aproximadas else ""
-        ax.set_title(f"{etapa}ª etapa (PAS {etapa}){sufixo}", loc="left")
-    axes[0].legend(fontsize=8, ncol=4, loc="lower center", bbox_to_anchor=(0.5, 1.12))
+        ax.set_title(f"{etapa}ª etapa (PAS {etapa})", loc="left")
+    axes[0].legend(fontsize=7.5, ncol=3, loc="lower center", bbox_to_anchor=(0.5, 1.12))
     axes[-1].xaxis.set_major_locator(mdates.YearLocator())
     axes[-1].xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
     axes[-1].set_xlabel("Data de aplicação da prova")
     fig.supylabel(YLABEL[prova])
-    nota = (
-        "Médias de candidatos que chegaram à classificação do PAS 3"
-        + ("; faixas: IC 95% da média" if com_ic else "")
-        + ". Rótulos em cinza: subprograma."
-    )
-    fig.text(0.5, -0.01, nota, ha="center", fontsize=8, color="0.35")
+    fig.text(0.5, -0.025, nota, ha="center", fontsize=8, color="0.35", va="top")
     fig.tight_layout()
     return fig
+
+
+def _figuras(t, base, com_ic, grupos, rotulos, nota, sufixo=""):
+    t.to_csv(base / f"F1_dados{sufixo}.csv", index=False, float_format="%.4f", date_format="%Y-%m-%d")
+    print(f"  salvo: {(base / f'F1_dados{sufixo}.csv').name}")
+    for prova in PROVAS:
+        fig = desenhar(t, prova, com_ic, grupos, rotulos, nota)
+        salvar(fig, base, f"F1_{prova}{sufixo}")
+        plt.close(fig)
+
+
+def executar(df: pd.DataFrame, escopo: str, area, com_ic: bool = True) -> None:
+    subs = sorted(set(df["subprograma"]))
+    aviso_dados = "Médias de candidatos que chegaram à classificação do PAS 3. * data atípica (pandemia). Rótulo cinza: subprograma."
+
+    # --- padrão: grupo da inscrição (disjunto) + linha "Universal amplo" ---
+    base_geral = pasta_saida("F1", escopo, area, homologados=False)
+    b = df.assign(_g=df["grupo_concorrencia"])
+    b = pd.concat([b, df.assign(_g=GRUPO_AMPLO)], ignore_index=True)
+    t = calcular(b, subs)
+    nota = aviso_dados + (" Faixas: IC 95%." if com_ic else "")
+    _figuras(t, base_geral, com_ic, GRUPOS + [GRUPO_AMPLO], ROTULO_GRUPO, nota)
+
+    # --- homologados: só convocados, grupo = cota da vaga (disjunto) ---
+    ap = df[df["aprovado_bool"] & df["cota_aprovacao"].notna()].copy()
+    if ap.empty:
+        print("  [homologados] sem convocados com cota_aprovacao; pulando.")
+        return
+    ap["_g"] = ap["cota_aprovacao"].map(grupo_de_cota)
+    sem = ap.loc[ap["_g"].isna(), "cota_aprovacao"]
+    if len(sem):
+        print(f"  [homologados] {len(sem)} convocados com cota_aprovacao não reconhecida "
+              f"(ignorados): {sorted(set(sem))[:8]}")
+    ap = ap.dropna(subset=["_g"])
+    
+    pasta_aprov = pasta_saida("F1", escopo, area, homologados=True)
+    t2 = calcular(ap, subs)
+    nota2 = ("Somente candidatos convocados para homologação, agrupados pela cota da vaga (cota_aprovacao): "
+             "o topo do ranking de cada cota. * data atípica. Rótulo cinza: subprograma."
+             + (" Faixas: IC 95%." if com_ic else ""))
+    _figuras(t2, pasta_aprov, com_ic, GRUPOS, ROTULO_HOMOLOGADOS, nota2, sufixo="_homologados")
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--tabela", default=TABELA_PADRAO, help="CSV em parsed_data/")
-    ap.add_argument("--subprogramas", default=SUBPROGRAMAS_PADRAO, help="CSV em parsed_data/ com as datas")
     ap.add_argument("--sem-ic", action="store_true", help="não desenha as faixas de IC95%%")
+    ap.add_argument("--escopo", choices=["computacao", "geral", "curso"], default="computacao")
     args = ap.parse_args()
-
-    df = carregar_alunos(args.tabela)
-    if "grupo_concorrencia" not in df.columns:
-        sys.exit(f"Coluna grupo_concorrencia ausente em {args.tabela}")
-    subs = ordem_subprogramas(df["subprograma"])
-    datas, aproximadas = carregar_datas(args.subprogramas)
-    t = calcular(df, datas, subs)
-
-    saida = pasta_saida("F1")
-    t.to_csv(saida / "F1_dados.csv", index=False, float_format="%.4f", date_format="%Y-%m-%d")
-    print("  salvo: F1_dados.csv")
-    for prova in PROVAS:
-        fig = desenhar(t, prova, com_ic=not args.sem_ic, aproximadas=aproximadas)
-        salvar(fig, saida, f"F1_{prova}")
-        plt.close(fig)
+    for df, escopo, area in recortes(args.tabela, (args.escopo,)):
+        print(f"== F1 | {escopo} {area or ''} ({len(df)} candidatos)")
+        executar(df, escopo, area, com_ic=not args.sem_ic)
 
 
 if __name__ == "__main__":
