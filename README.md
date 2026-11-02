@@ -20,9 +20,22 @@ formatá-los em **CSVs** a serem a base estatística para o trabalho:
 - **/parsed_data** : Armazena os resultados do processamento.
 
 ## Scripts
-Usamos os seguintes scripts python para o parsing / filtragem:
-- **results_scrapper.py** : Responsável por fazer o parse do arquivo de **Resultados finais do 3°subprograma do PAS**, 
-o que gera diversos metadados _(notas por subprograma, posição, argumento final...)_;
-- **classificated_filter.py** : Responsável por fazer o parse do arquivo de **Convocados para os cursos de graduação**, gerando
-metadados sobre os convocados por categoria de cota, com número de vagas detalhado por curso, que pode ser usado em conjunto com o
-CSV das notas para mapear candidatos do curso de computação e seu desempenho.
+Os extratores ficam em **`scripts/pas/`** e leem todos os PDFs de `raw_data/` de uma vez. Para gerar tudo:
+
+```bash
+pip install pypdf            # e poppler-utils (pdftotext), usado na validação
+python3 scripts/pas/run_all.py
+```
+
+O `run_all.py` roda a extração (`build_tables.py`), os filtros do grupo (`alteracoes_de_pipeline/remove_14-16.py` e `remove_eng_software.py`) e a validação (`validate.py`).
+
+**Tabelas do artigo** (em `parsed_data/`):
+- **tabela1_alunos_sem_eng_soft.csv**: uma linha por candidato e subprograma, com notas das 3 etapas, argumento final, classificação em cada cota, aprovação e homologação (anonimizado, sem nomes);
+- **tabela2_curso_cota_sem_eng_soft.csv**: vagas, inscritos, convocados e notas de corte por subprograma, curso, turno, semestre e categoria de cota;
+- **subprogramas_sem_eng_soft.csv**: datas e regras de cada subprograma.
+
+Documentação:
+- [`docs/glossario.md`](docs/glossario.md): o que cada coluna significa e de onde vem;
+- [`metodologia.md`](metodologia.md): como os dados foram extraídos, as correções feitas e o resumo da validação;
+- [`parsed_data/validacao.md`](parsed_data/validacao.md): relatório completo dos 13 testes de qualidade;
+- [`docs/plano-artigo.md`](docs/plano-artigo.md): o plano do artigo.

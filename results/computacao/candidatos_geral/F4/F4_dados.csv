@@ -1,0 +1,109 @@
+area_computacao,subprograma,grupo,nota_corte,vagas_1sem,convocados_1a_chamada,inscritos,curso
+CC_BACHARELADO,15-17,EP Não-PPI,-16.531,2.000,4,38.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,15-17,EP PPI,-20.100,4.000,6,22.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,15-17,Negros,44.690,1.000,1,7.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,15-17,Universal,95.153,9.000,9,138.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,16-18,EP Não-PPI,3.738,2.000,4,45.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,16-18,EP PPI,16.062,4.000,6,30.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,16-18,Negros,40.628,1.000,1,9.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,16-18,Universal,104.193,9.000,9,144.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,17-19,EP Não-PPI,3.512,2.000,4,117.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,17-19,EP PPI,11.977,4.000,6,59.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,17-19,Negros,49.989,1.000,1,20.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,17-19,Universal,93.530,9.000,9,295.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,18-20,EP Não-PPI,-75.280,4.000,10,54.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,18-20,EP PPI,-34.939,8.000,9,23.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,18-20,Negros,44.904,2.000,2,17.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,18-20,Universal,78.303,18.000,18,210.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,19-21,EP Não-PPI,46.784,2.000,4,112.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,19-21,EP PPI,9.006,4.000,6,41.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,19-21,Negros,82.755,1.000,1,27.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,19-21,Universal,115.002,9.000,9,360.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,20-22,EP Não-PPI,19.695,2.000,4,112.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,20-22,EP PPI,11.400,4.000,6,61.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,20-22,Negros,91.881,1.000,1,25.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,20-22,Universal,139.434,9.000,9,423.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,21-23,EP Não-PPI,8.992,2.000,4,81.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,21-23,EP PPI,-7.916,4.000,6,25.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,21-23,Negros,137.024,1.000,1,13.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,21-23,Universal,143.984,9.000,9,345.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,22-24,EP Não-PPI,66.657,2.000,3,136.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,22-24,EP PPI,10.477,4.000,6,33.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,22-24,Negros,97.824,1.000,1,15.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,22-24,Universal,138.670,9.000,9,407.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,23-25,EP Não-PPI,-38.263,2.000,6,62.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,23-25,EP PPI,0.178,4.000,3,13.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,23-25,Negros,117.648,1.000,1,17.000,Ciência da Computação (bacharelado)
+CC_BACHARELADO,23-25,Universal,135.827,9.000,9,336.000,Ciência da Computação (bacharelado)
+COMPUTACAO_LICENCIATURA,15-17,EP Não-PPI,-55.713,2.000,5,6.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,15-17,EP PPI,18.841,6.000,1,1.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,15-17,Negros,-19.201,1.000,1,5.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,15-17,Universal,-19.395,10.000,16,45.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,16-18,EP Não-PPI,-55.024,2.000,4,19.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,16-18,EP PPI,-65.970,6.000,8,15.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,16-18,Negros,-6.570,1.000,1,5.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,16-18,Universal,-0.779,10.000,10,72.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,17-19,EP Não-PPI,-45.346,2.000,4,15.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,17-19,EP PPI,-77.942,6.000,8,10.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,17-19,Negros,,1.000,0,0.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,17-19,Universal,-51.581,10.000,11,27.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,18-20,EP Não-PPI,-28.675,4.000,4,6.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,18-20,EP PPI,36.577,12.000,1,2.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,18-20,Negros,,2.000,0,0.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,18-20,Universal,-96.333,20.000,22,27.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,19-21,EP Não-PPI,-57.125,2.000,2,6.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,19-21,EP PPI,-81.096,6.000,3,4.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,19-21,Negros,-3.314,1.000,1,2.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,19-21,Universal,-20.863,10.000,17,37.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,20-22,EP Não-PPI,-65.745,2.000,4,18.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,20-22,EP PPI,-85.346,6.000,8,16.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,20-22,Negros,-63.586,1.000,1,1.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,20-22,Universal,-2.433,10.000,10,39.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,21-23,EP Não-PPI,-50.802,2.000,2,5.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,21-23,EP PPI,-5.522,6.000,1,2.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,21-23,Negros,35.660,1.000,1,3.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,21-23,Universal,-26.500,10.000,18,34.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,22-24,EP Não-PPI,-98.432,2.000,6,10.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,22-24,EP PPI,-25.052,6.000,1,1.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,22-24,Negros,-27.049,1.000,1,2.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,22-24,Universal,-20.196,10.000,15,47.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,23-25,EP Não-PPI,-44.036,2.000,5,5.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,23-25,EP PPI,,6.000,0,0.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,23-25,Negros,-23.781,1.000,1,2.000,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,23-25,Universal,-22.177,10.000,17,48.000,"Computação (licenciatura, noturno)"
+ENG_COMPUTACAO,15-17,EP Não-PPI,-17.233,2.000,4,20.000,Engenharia de Computação
+ENG_COMPUTACAO,15-17,EP PPI,-17.227,4.000,6,12.000,Engenharia de Computação
+ENG_COMPUTACAO,15-17,Negros,106.947,1.000,1,5.000,Engenharia de Computação
+ENG_COMPUTACAO,15-17,Universal,107.987,9.000,9,76.000,Engenharia de Computação
+ENG_COMPUTACAO,16-18,EP Não-PPI,1.365,2.000,4,46.000,Engenharia de Computação
+ENG_COMPUTACAO,16-18,EP PPI,8.353,4.000,6,30.000,Engenharia de Computação
+ENG_COMPUTACAO,16-18,Negros,91.029,1.000,1,7.000,Engenharia de Computação
+ENG_COMPUTACAO,16-18,Universal,129.881,9.000,9,99.000,Engenharia de Computação
+ENG_COMPUTACAO,17-19,EP Não-PPI,14.775,2.000,4,46.000,Engenharia de Computação
+ENG_COMPUTACAO,17-19,EP PPI,21.956,4.000,6,27.000,Engenharia de Computação
+ENG_COMPUTACAO,17-19,Negros,143.204,1.000,1,10.000,Engenharia de Computação
+ENG_COMPUTACAO,17-19,Universal,118.194,9.000,9,143.000,Engenharia de Computação
+ENG_COMPUTACAO,18-20,EP Não-PPI,-63.631,4.000,7,24.000,Engenharia de Computação
+ENG_COMPUTACAO,18-20,EP PPI,-44.598,8.000,12,18.000,Engenharia de Computação
+ENG_COMPUTACAO,18-20,Negros,21.015,2.000,2,8.000,Engenharia de Computação
+ENG_COMPUTACAO,18-20,Universal,76.169,18.000,19,104.000,Engenharia de Computação
+ENG_COMPUTACAO,19-21,EP Não-PPI,17.976,2.000,3,54.000,Engenharia de Computação
+ENG_COMPUTACAO,19-21,EP PPI,13.355,4.000,6,31.000,Engenharia de Computação
+ENG_COMPUTACAO,19-21,Negros,84.173,1.000,1,9.000,Engenharia de Computação
+ENG_COMPUTACAO,19-21,Universal,131.450,9.000,9,193.000,Engenharia de Computação
+ENG_COMPUTACAO,20-22,EP Não-PPI,-52.218,2.000,4,49.000,Engenharia de Computação
+ENG_COMPUTACAO,20-22,EP PPI,-0.447,4.000,6,26.000,Engenharia de Computação
+ENG_COMPUTACAO,20-22,Negros,44.324,1.000,1,3.000,Engenharia de Computação
+ENG_COMPUTACAO,20-22,Universal,120.321,9.000,9,148.000,Engenharia de Computação
+ENG_COMPUTACAO,21-23,EP Não-PPI,29.216,2.000,4,66.000,Engenharia de Computação
+ENG_COMPUTACAO,21-23,EP PPI,8.390,4.000,6,23.000,Engenharia de Computação
+ENG_COMPUTACAO,21-23,Negros,46.950,1.000,1,7.000,Engenharia de Computação
+ENG_COMPUTACAO,21-23,Universal,120.445,9.000,9,199.000,Engenharia de Computação
+ENG_COMPUTACAO,22-24,EP Não-PPI,3.711,2.000,4,60.000,Engenharia de Computação
+ENG_COMPUTACAO,22-24,EP PPI,-47.118,4.000,5,15.000,Engenharia de Computação
+ENG_COMPUTACAO,22-24,Negros,119.763,1.000,1,15.000,Engenharia de Computação
+ENG_COMPUTACAO,22-24,Universal,119.931,9.000,9,225.000,Engenharia de Computação
+ENG_COMPUTACAO,23-25,EP Não-PPI,-33.752,2.000,3,33.000,Engenharia de Computação
+ENG_COMPUTACAO,23-25,EP PPI,-67.012,4.000,6,8.000,Engenharia de Computação
+ENG_COMPUTACAO,23-25,Negros,70.718,1.000,1,9.000,Engenharia de Computação
+ENG_COMPUTACAO,23-25,Universal,120.918,9.000,9,194.000,Engenharia de Computação

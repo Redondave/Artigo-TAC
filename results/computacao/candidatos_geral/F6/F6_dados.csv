@@ -1,0 +1,28 @@
+area_computacao,subprograma,candidatos,cotistas_candidatos,aprovados,cotistas_aprovados,aprovados_com_categoria,aprovados_por_vaga_de_cota,vagas,vagas_reservadas,pct_cotistas_candidatos,pct_cotistas_aprovados,pct_aprovados_por_vaga_de_cota,pct_vagas_reservadas,razao_representacao,curso
+CC_BACHARELADO,15-17,138,36,57,27,57,27,40.00,22.00,26.09,47.37,47.37,55.00,1.82,Ciência da Computação (bacharelado)
+CC_BACHARELADO,16-18,144,46,63,34,63,34,40.00,22.00,31.94,53.97,53.97,55.00,1.69,Ciência da Computação (bacharelado)
+CC_BACHARELADO,17-19,295,113,47,25,47,25,40.00,22.00,38.31,53.19,53.19,55.00,1.39,Ciência da Computação (bacharelado)
+CC_BACHARELADO,18-20,210,62,44,25,44,25,40.00,22.00,29.52,56.82,56.82,55.00,1.92,Ciência da Computação (bacharelado)
+CC_BACHARELADO,19-21,360,108,57,31,57,31,40.00,22.00,30.00,54.39,54.39,55.00,1.81,Ciência da Computação (bacharelado)
+CC_BACHARELADO,20-22,423,106,54,29,54,29,40.00,22.00,25.06,53.70,53.70,55.00,2.14,Ciência da Computação (bacharelado)
+CC_BACHARELADO,21-23,345,79,64,35,64,35,40.00,22.00,22.90,54.69,54.69,55.00,2.39,Ciência da Computação (bacharelado)
+CC_BACHARELADO,22-24,407,123,66,32,66,31,40.00,22.00,30.22,48.48,46.97,55.00,1.60,Ciência da Computação (bacharelado)
+CC_BACHARELADO,23-25,336,73,55,29,55,28,40.00,22.00,21.73,52.73,50.91,55.00,2.43,Ciência da Computação (bacharelado)
+COMPUTACAO_LICENCIATURA,15-17,45,11,45,11,45,8,46.00,26.00,24.44,24.44,17.78,56.52,1.00,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,16-18,72,20,65,19,65,17,46.00,26.00,27.78,29.23,26.15,56.52,1.05,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,17-19,27,12,27,12,27,12,46.00,26.00,44.44,44.44,44.44,56.52,1.00,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,18-20,27,5,27,5,27,5,46.00,26.00,18.52,18.52,18.52,56.52,1.00,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,19-21,37,7,37,7,37,6,46.00,26.00,18.92,18.92,16.22,56.52,1.00,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,20-22,39,13,39,13,39,13,46.00,26.00,33.33,33.33,33.33,56.52,1.00,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,21-23,34,7,34,7,34,5,46.00,26.00,20.59,20.59,14.71,56.52,1.00,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,22-24,47,12,47,12,47,8,46.00,26.00,25.53,25.53,17.02,56.52,1.00,"Computação (licenciatura, noturno)"
+COMPUTACAO_LICENCIATURA,23-25,48,7,48,7,48,6,46.00,26.00,14.58,14.58,12.50,56.52,1.00,"Computação (licenciatura, noturno)"
+ENG_COMPUTACAO,15-17,76,22,62,20,62,19,40.00,22.00,28.95,32.26,30.65,55.00,1.11,Engenharia de Computação
+ENG_COMPUTACAO,16-18,99,41,79,36,79,32,40.00,22.00,41.41,45.57,40.51,55.00,1.10,Engenharia de Computação
+ENG_COMPUTACAO,17-19,143,47,66,30,66,29,40.00,22.00,32.87,45.45,43.94,55.00,1.38,Engenharia de Computação
+ENG_COMPUTACAO,18-20,104,27,53,21,52,21,40.00,22.00,25.96,39.62,40.38,55.00,1.53,Engenharia de Computação
+ENG_COMPUTACAO,19-21,193,49,78,42,78,42,40.00,22.00,25.39,53.85,53.85,55.00,2.12,Engenharia de Computação
+ENG_COMPUTACAO,20-22,148,47,60,35,60,35,40.00,22.00,31.76,58.33,58.33,55.00,1.84,Engenharia de Computação
+ENG_COMPUTACAO,21-23,199,54,53,27,53,27,40.00,22.00,27.14,50.94,50.94,55.00,1.88,Engenharia de Computação
+ENG_COMPUTACAO,22-24,225,68,60,35,60,33,40.00,22.00,30.22,58.33,55.00,55.00,1.93,Engenharia de Computação
+ENG_COMPUTACAO,23-25,194,41,55,25,55,25,40.00,22.00,21.13,45.45,45.45,55.00,2.15,Engenharia de Computação
