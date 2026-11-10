@@ -1,0 +1,423 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Evolução Histórica do Desempenho e da Demanda pelos Cursos de Computação da UnB no PAS: Uma Análise sob a Perspectiva de Cotas}
+
+\author{
+  \IEEEauthorblockN{Pedro Marcinoni V. R. V. da Rosa}
+  \IEEEauthorblockA{\textit{Dept. de Ciência da Computação (CIC)} \\
+  \textit{Inst. de Ciências Exatas (IE) -- UnB}\\
+  Brasília, DF, Brasil \\
+  {\small pedroextrer@gmail.com}}
+  \and
+  \IEEEauthorblockN{Davi Brasileiro Gomes}
+  \IEEEauthorblockA{\textit{Dept. de Ciência da Computação (CIC)} \\
+  \textit{Inst. de Ciências Exatas (IE) -- UnB}\\
+  Brasília, DF, Brasil \\
+  {\small davi.brasileiro.gomes@gmail.com}}
+  \and
+  \IEEEauthorblockN{Lucas Centurion Netto}
+  \IEEEauthorblockA{\textit{Dept. de Ciência da Computação (CIC)} \\
+  \textit{Inst. de Ciências Exatas (IE) -- UnB}\\
+  Brasília, DF, Brasil \\
+  {\small lcenturionnetto@gmail.com}}
+}
+
+\maketitle
+
+\begin{abstract}
+O Programa de Avaliação Seriada (PAS) da Universidade de Brasília (UnB) seleciona estudantes do ensino médio por meio de três provas aplicadas ao final de cada ano escolar. Desde a Lei de Cotas de 2012, metade das vagas é reservada a egressos de escolas públicas, com subdivisões por renda, raça e deficiência, e a UnB mantém ainda uma cota própria para candidatos negros. Este artigo analisa a evolução do desempenho dos candidatos e da demanda pelos cursos de computação da UnB no PAS ao longo de nove subprogramas completos, de 2015 a 2017 até 2023 a 2025, sob a perspectiva desses sistemas de concorrência. O estudo responde a quatro questões de pesquisa: 1) Como evoluíram o desempenho médio e a distância de desempenho dos candidatos a cursos de computação entre o Sistema Universal e os demais sistemas de cotas; 2) Como evoluíram as notas de corte em geral e por sistema de cotas nos quatro cursos de computação da UnB; 3) Como evoluiu a demanda pelos quatro cursos, no total e por sistema de concorrência; e 4) Como fatores exógenos se associam às mudanças observadas nas RQs de 1 a 3. Os dados foram extraídos dos editais oficiais de resultados e analisados por meio de estatística descritiva e testes de hipótese, etapa a etapa e subprograma a subprograma. A análise considera também fatores que marcaram o período, como a pandemia de COVID-19, a popularização da Inteligência Artificial e a reforma da Lei de Cotas em 2023, que reduziu o limite de renda e alterou a ordem de seleção.
+\end{abstract}
+
+\renewcommand\IEEEkeywordsname{Palavras-chave}
+\begin{IEEEkeywords}
+Ensino Superior, Ciência da Computação, Lei de Cotas, Desempenho Acadêmico, Avaliação Seriada, Análise de Dados.
+\end{IEEEkeywords}
+
+\section{Introdução}
+
+O desenvolvimento tecnológico das últimas décadas impulsionou a procura por cursos de graduação na área de Computação. Historicamente, no entanto, o ingresso nessas graduações é marcado por uma forte homogeneidade demográfica e socioeconômica. Esse cenário se caracteriza pela predominância de estudantes homens, brancos e de classes sociais com maior poder aquisitivo. Para mitigar essas disparidades estruturais e democratizar o acesso ao ensino superior, políticas de ações afirmativas foram implementadas no Brasil. O principal marco desse processo é a Lei de Cotas de 2012, que estabeleceu reservas de vagas baseadas em critérios de rede de ensino, renda e raça.
+
+Este artigo investiga a evolução e o impacto desse sistema de reservas na Universidade de Brasília (UnB). A análise tem como foco o Programa de Avaliação Seriada (PAS), uma modalidade trienal de ingresso contínuo. O estudo abrange os dados de nove subprogramas completos, concluídos entre 2015 e 2025. O escopo da avaliação recai especificamente sobre os cursos de Computação do campus Darcy Ribeiro: Ciência da Computação (Bacharelado), Computação (Licenciatura) e Engenharia da Computação. Os desempenhos e a demanda dos candidatos são analisados sob a ótica dos diferentes sistemas de concorrência, que incluem o Sistema Universal, as cotas para negros e as subdivisões socioeconômicas para egressos de escolas públicas.
+
+Além do funcionamento interno do processo seletivo, a pesquisa considera o impacto de transformações externas ao longo da última década. Entre esses fatores, destacam-se os efeitos da pandemia de COVID-19 no cronograma e no rendimento escolar. O estudo também avalia o reflexo da popularização da Inteligência Artificial no aumento geral do interesse pela área técnica. Por fim, são analisados os impactos da recente atualização da Lei de Cotas em 2023, que alterou os limites de renda e modificou a ordem de prioridade no preenchimento das vagas.
+
+Neste contexto, este artigo apresenta uma análise da evolução histórica do desempenho e da demanda pelos cursos de Computação da UnB, tendo como questões de pesquisa: (1) Como evoluíram o desempenho médio e a distância de notas entre os candidatos do Sistema Universal e os candidatos dos sistemas de cotas? (2) Como evoluíram as notas de corte e qual foi a efetividade do acesso via cotas nos cursos analisados? (3) Como se comportaram a atratividade e a concorrência real nos diferentes sistemas de ingresso? e (4) De que maneira as mudanças regulatórias e os eventos externos se associam às variações observadas no desempenho, no acesso e na demanda?
+
+Para responder a essas questões de pesquisa, foram utilizados os dados extraídos dos editais oficiais do PAS/UnB referentes aos subprogramas concluídos entre 2015 e 2025. Um \textit{pipeline} automatizado em Python foi utilizado para a extração, limpeza e consolidação das informações, por causa do grande volume de registros e da complexidade dos dados não estruturados em formato PDF.
+
+Este artigo apresenta a seguinte estrutura: a Seção II descreve o referencial teórico; os trabalhos relacionados são explorados na Seção III; a metodologia de extração e a análise dos dados são detalhadas na Seção IV; a Seção V apresenta e discute os resultados obtidos; e, por fim, a conclusão e os trabalhos futuros são expostos na Seção VI.
+
+\section{Referencial Teórico}
+
+Essa seção apresenta o sistema de admissão do Programa de Avaliação Seriada da Universidade de Brasília (PAS/UnB) e seu sistema de cotas, bem como uma breve contextualização a respeito de acontecimentos históricos de influência importante no desempenho e na demanda dos alunos ao longo dos 10 últimos subprogramas.
+
+\subsection{Sistema de Admissão do PAS/UnB}
+
+O Programa de Avaliação Seriada (PAS) é um processo seletivo da Universidade de Brasília (UnB) criado em 1995, como alternativa de ingresso ao vestibular tradicional e, posteriormente, ao Exame Nacional do Ensino Médio (ENEM). Ele é realizado em três etapas anuais, agrupadas em um subprograma, cujas provas são aplicadas de forma sequencial ao término de cada ano letivo do Ensino Médio brasileiro, a fim de valorizar o aprendizado contínuo. Em cada etapa, os candidatos são avaliados por meio de uma prova de redação e uma prova de conhecimentos interdisciplinares. Esta última é subdividida em Parte I (língua estrangeira) e Parte II (conteúdos referentes àquele ano escolar e obras culturais pré-selecionadas). Ao final do triênio, o Argumento Final de cada candidato é calculado de forma cumulativa e ponderada, atribuindo-se pesos específicos a cada etapa, com base nas fórmulas apresentadas abaixo:
+
+\begin{equation}
+    \mathrm{AF} = \mathrm{AP}_1 + 2\mathrm{AP}_2 + 3\mathrm{AP}_3
+\end{equation}
+
+\begin{equation}
+    \mathrm{AP}_i = 10 \times (P_{1} Z_{\mathrm{EBP1}_i} + P_{2} Z_{\mathrm{EBP2}_i} + P_{R} Z_{\mathrm{NR}_i})
+\end{equation}
+
+\begin{equation}
+    Z_x = \frac{x - \overline{x}}{\mathrm{DP}_x}
+\end{equation}
+
+Onde, para a etapa $i$ (com $i \in \{1, 2, 3\}$):
+\begin{itemize}
+    \item $\mathrm{AP}_i$ é o Afastamento Padronizado do candidato na etapa;
+    \item $Z_x$ representa o escore padronizado para uma nota $x$;
+    \item $P_1$, $P_2$ e $P_R$ representam os pesos atribuídos a cada prova. A soma desses pesos é sempre igual a 1 ($P_1 + P_2 + P_R = 1$) e os valores costumam equivaler historicamente a cerca de 7\%, 83\% e 10\%, respectivamente;
+    \item $\mathrm{EBP1}_i$ e $\mathrm{EBP2}_i$ são os Escores Brutos obtidos na Parte I (Língua Estrangeira) e na Parte II (Conhecimentos Específicos);
+    \item $\mathrm{NR}_i$ é a Nota de Redação obtida pelo candidato;
+    \item $\overline{x}$ e $\mathrm{DP}_x$ representam, respectivamente, a média aritmética e o desvio padrão de todos os candidatos não eliminados na respectiva prova avaliada ($x$).
+\end{itemize}
+
+A partir da métrica do Argumento Final, as convocações dos candidatos com os maiores desempenhos ocorrem em sucessivas chamadas, até o preenchimento total das vagas destinadas a cada curso para o 1° e o 2° semestres letivos da universidade, considerados os diferentes sistemas de concorrência.
+
+\subsection{A Estrutura do Sistema de Cotas (2014-2025)}
+
+Ao longo da década analisada neste estudo, a distribuição de vagas do PAS/UnB foi regida majoritariamente pelas diretrizes da Lei de Cotas original (Lei nº 12.711/2012) e pelas políticas internas da universidade. Nesse período, as vagas foram divididas em três sistemas principais de concorrência: o Sistema Universal, o Sistema de Cotas para Negros e o Sistema de Cotas para Escolas Públicas.
+
+O Sistema de Cotas para Escolas Públicas, que historicamente concentra 50\% das vagas, subdivide-se a partir de três critérios socioeconômicos binários e cumulativos:
+
+\begin{enumerate}
+    \item \textbf{Autodeclaração Étnico-Racial:} enquadramento ou não como candidato Preto, Pardo ou Indígena (PPI).
+    \item \textbf{Renda Per Capita:} renda familiar bruta menor/igual a 1,5 salário mínimo ou superior a esse teto.
+    \item \textbf{Condição de Deficiência (PcD):} ateste ou não da condição de pessoa com deficiência.
+\end{enumerate}
+
+A combinação desses três requisitos divide os candidatos de escola pública em 8 categorias ($2^3$). Historicamente, até o subprograma 2021-2023, a seleção funcionava em uma cascata restritiva: o candidato disputava primeiro as vagas da sua cota específica e, caso não fosse aprovado, concorria no Sistema Universal. Entretanto, a partir do subprograma 2022-2024, essa lógica de concorrência foi invertida: o candidato cotista passou a disputar primeiramente as vagas do Sistema Universal, concorrendo às vagas reservadas de sua cota apenas se não alcançasse a nota de corte geral.
+
+Essa inversão de fluxo foi oficializada pela recente Lei Federal nº 14.723/2023, que também alterou os requisitos originais da Lei de Cotas ao reduzir o teto de renda per capita de 1,5 para 1 salário mínimo e incluir candidatos quilombolas no sistema de reservas. Tais modificações já incidem sobre os editais da terceira etapa dos subprogramas finalizados em 2024 e 2025, sendo os seus reflexos nas notas de corte contemplados nesta análise.
+
+\subsection{Fatores Exógenos e Mudanças Regulatórias}
+
+A análise histórica de dados educacionais demanda a compreensão do contexto em que as avaliações ocorrem. Ao longo do período analisado, o calendário e as regras do PAS/UnB sofreram mudanças estruturais, enquanto a dinâmica de preparação dos candidatos foi atravessada por eventos sociais, tecnológicos e de saúde pública de grande magnitude. Tais fatores devem ser necessariamente considerados na comparação entre os subprogramas.
+
+No âmbito da saúde pública, a pandemia de COVID-19 impactou severamente o cronograma de avaliações. A terceira etapa do subprograma 2018--2020, remarcada para março de 2021, foi suspensa pelo decreto de \textit{lockdown} do Distrito Federal e aplicada apenas em julho de 2021. Da mesma forma, a terceira prova do subprograma 2019--2021 ocorreu somente em janeiro de 2022. Além dos atrasos, as adversidades impostas pelo ensino remoto podem ter afetado o desempenho dos candidatos, hipótese discutida na Seção~V.
+
+No que tange à concorrência e à escolha de curso, mudanças regulatórias e tendências de mercado exerceram papéis determinantes. O Sistema Informatizado de Seleção (SISUnB), vigente entre 2016 e 2019, permitia ao candidato da terceira etapa trocar sua opção após conhecer seu desempenho e as notas de corte. Com sua extinção a partir do ingresso em 2020, o curso passou a ser definido irrevogavelmente na inscrição. Simultaneamente a essa maior rigidez, observou-se uma acelerada popularização de tecnologias emergentes, impulsionada pela expansão e adoção comercial de ferramentas baseadas em Inteligência Artificial. Esse fenômeno pode ter fomentado o interesse por carreiras na área de Tecnologia da Informação (TI), refletindo-se em um aumento da demanda e da concorrência nesses cursos.
+
+Outra alteração estrutural relevante ocorreu em 2022, quando o PAS flexibilizou seus critérios de participação. Até 2021, os editais exigiam a comprovação de matrícula regular no ensino médio. A partir de agosto de 2022, passou a ser cobrado apenas o certificado de conclusão do ensino médio no momento do registro acadêmico, tornando possível a inscrição simultânea em mais de um subprograma. Dessa forma, o contingente de concorrentes passou a englobar também indivíduos que já concluíram a educação básica.
+
+Por fim, a Lei nº 14.723/2023 reduziu o teto de renda \textit{per capita} de 1,5 para 1 salário mínimo, incluiu os candidatos quilombolas e determinou que todos concorram primeiramente às vagas de ampla concorrência, recorrendo às reservas de vagas apenas se não alcançarem a nota de corte geral. No PAS, essas diretrizes aparecem a partir do edital da terceira etapa do subprograma 2022--2024, de agosto de 2024. Em tese, essa nova dinâmica tende a elevar as notas de corte do Sistema Universal e atenuar as das cotas, aspecto também explorado na Seção~V.
+
+\section{Trabalhos relacionados}
+A fim de obter a massa de trabalhos utilizados como referência neste artigo, foi utilizado um processo de busca sistemática de materiais relacionados, considerando um processo de coleta, limpeza/filtração e extração dos documentos mais relevantes para a pesquisa. Inicialmente, foi feita uma busca superficial no \textit{Elseviewer Scopus} com a string de busca "Computer Science AND University AND Entrance Exams", achando 21 trabalhos relacionados, que se mostraram relevantes para a compreensão da competitividade no ingresso aos cursos de computação no ensino superior. Posteriormente, os resultados foram analisados usando a ferramenta de IA \textit{Consensus}, expandindo a base de busca para achar cerca de 3000 trabalhos relacionados, alguns dos quais pertencentes à universidades federais do Brasil. Assim, foi possível enriquecer a pesquisa com a análise do desempenho para admissão em cursos universitários de computação considerando realidades socioeconômicas distintas entre as macroregiões do país. Ademais, essa expansão também permitiu ter maior profundidade na análise de períodos marcantes na educação do país, como pela adoção de recursos de IA ou pelo impacto da pandemia da COVID-19 no ensino superior.
+
+Portanto, R. Matheus et al \cite{Matheus2025Effectiveness} elenca a maior expressão de disparidade no desempenho das provas de admissão da UNESP em áreas da matemática, quando em comparação às humanidades, o que revela um impacto considerável no ingresso aos cursos de computação, fortemente associados ao primeiro campo citado.
+
+A. Golgher \cite{Golgher2022The} e Alex Mommert et al. \cite{Mommert2020Exam} manifestam a manutenção da disparidade no desempenho das provas apesar da política de cotas, ainda revelando que as categorias associadas à fatores econômicos foram mais impactadas do que aquelas relativas a fatores étnicos.
+
+Já Marcell Nagy et al \cite{Nagy2021Comprehensive} estuda a eficácia de uma prova de conhecimentos enquanto mecanismo de avaliação de aprendizado na Hungria. No estudo, é avaliado que os conhecimentos gerais tendem a ser mais impactantes do que conteúdos específicos, de modo que o desempenho em provas de campos determinados não é fator isolado para causar disparidade na aceitação dos cursos de computação.
+
+Por outro lado, T. Camp et al. \cite{Camp2017Generation} avalia a evolução do interesse nos cursos de computação considerando o desenvolvimento tecnológico, bem como a gama dos conhecimentos necessários para a área, para além daqueles avaliados em provas de admissão.
+
+Paralelamente, A. Sobaih et al. \cite{Sobaih2022Higher} e J. Iqbal et al. \cite{Iqbal2021The} manifestam o impacto da pandemia da COVID-19 e a ascensão do uso de redes sociais no desempenho acadêmico de modo geral, avaliando também o ingresso no ensino superior em períodos comparativos.
+
+Assim, o presente artigo se destaca por analisar os fatores elencados sob a perspectiva do PAS/UnB, que tem particularidades no modo de aplicação e de avaliação (a exemplo do modelo seriado e dos conteúdos demandados a cada subetapa), e também nas categorias de cotas. Com isso, é esperado que a relação entre as variáveis demonstre um efeito similar ao observado em outras intsituições, porém com variações próprias do perfil socioeconômico da cidade. Ademais, será possível compreender como que a realidade urbana e metropolitana da capital influencia a seleção de cursos e a metodologia de acesso ao ensino superior considerando as múltiplas realidades sociais encontradas.
+
+\section{Metodologia}
+
+Esta seção detalha o procedimento metodológico adotado para a coleta, o pré-processamento, e a validação empírica dos dados do Programa de Avaliação Seriada da Universidade de Brasília (PAS/UnB). Todo o código-fonte desenvolvido, os esquemas de validação e as bases tratadas estão publicamente disponíveis no repositório do estudo em \texttt{https://github.com/Redondave/Artigo-TAC}.
+
+\subsection{Delimitação do Escopo e Fontes de Dados}
+
+A análise compreende o intervalo de 2015 a 2025, totalizando nove subprogramas completos (triênios de 2015--2017 a 2023--2025). Embora o subprograma 2014--2016 tenha sido inicialmente extraído, optou-se pela sua exclusão do conjunto em análise, uma vez que, para essa edição, não há edital de abertura com o quadro de vagas por cota no acervo público do Centro Brasileiro de Pesquisa em Avaliação e Seleção e de Promoção de Eventos (Cebraspe), as listas de convocação não explicitam o sistema de concorrência e os resultados finais das etapas 1 e 2 não estão disponíveis.
+
+Quanto aos cursos de graduação, o foco incide sobre as graduações de Computação do campus Darcy Ribeiro: Ciência da Computação (Bacharelado), Computação (Licenciatura) e Engenharia de Computação. O curso de Engenharia de Software foi excluído da análise específica por ser ofertado na Faculdade do Gama (FGA), cujo ingresso ocorre por entrada unificada ("Engenharias – FGA"). Como a escolha da habilitação é feita apenas após a matrícula, é inviável isolar estatisticamente as notas de corte e a demanda da área de software no certame do PAS. Não obstante, os dados de todos os cursos da UnB foram preservados na base geral para contextualizar os dados da computação frente ao restante da universidade.
+
+Os dados primários foram obtidos exclusivamente a partir dos documentos oficiais em formato PDF, disponibilizados pelo Cebraspe nas páginas eletrônicas específicas de cada subprograma do PAS/UnB\footnote{O acervo de editais de todos os subprogramas do PAS pode ser acessado no portal oficial da banca organizadora, na seção dedicada à seleção: \texttt{https://www.cebraspe.org.br/pas/subprogramas}}. Dessa documentação, foram extraídas as seguintes informações:
+\begin{enumerate}
+    \item \textbf{Editais de Abertura:} quadros de vagas distribuídas por campus, turno, semestre e categoria de concorrência;
+    \item \textbf{Editais de Resultado Final do PAS 3:} desempenho nas três etapas (Escores Brutos da Parte I e II, Nota de Redação), Argumento Final padronizado, curso escolhido e classificação nas categorias de concorrência elegíveis;
+    \item \textbf{Editais de Resultado Final do PAS 1 e 2:} desempenho e presença de candidatos que participaram das etapas iniciais;
+    \item \textbf{Editais de Retificação e \textit{Sub Judice}:} ajustes pontuais em editais, reclassificações e inclusão de candidatos amparados por decisões judiciais;
+    \item \textbf{Editais de Convocação para Registro Acadêmico:} relação nominal de chamadas sucessivas por semestre, indicando a cota efetiva da vaga obtida;
+    \item \textbf{Relações de Registro Acadêmico Homologado:} listagens finais de candidatos com matrícula confirmada.
+\end{enumerate}
+
+\subsection{Pipeline de Extração}
+
+Desenvolveu-se um pipeline automatizado em Python estruturado em três estágios sequenciais: extração bruta, filtros de consistência e validação cruzada.
+
+A leitura dos PDFs foi realizada pela biblioteca \texttt{pypdf}, com armazenamento em cache intermediário (\texttt{JSON}) para acelerar a reprodução dos experimentos. Foi implementado um módulo de normalização textual para sanar inconsistências decorrentes da quebra de fluxo nos PDFs, tais como sinais negativos separados do valor numérico, dígitos fracionados por quebras de linha e palavras partidas.
+
+Para resguardar a privacidade dos concorrentes em conformidade com as diretrizes éticas e a Lei Geral de Proteção de Dados (LGPD), nenhum nome ou número de inscrição foi armazenado nas tabelas finais. Cada participante recebeu um identificador pseudonimizado único, calculado por meio de função de dispersão criptográfica SHA-256 combinando a inscrição do estudante, o subprograma de origem e um sal fixo (\textit{salt}). Esse identificador conecta com precisão os registros das três etapas e as convocações.
+
+A extração das categorias de concorrência opera de maneira dinâmica a partir das frases de ordenamento presentes no título de cada edital e das legendas das convocações, adaptando-se a variações históricas (introdução de vagas PcD e as alterações da Lei nº 14.723/2023). Mapearam-se as dez categorias de concorrência: Sistema Universal, Cotas para Negros e oito subcategorias de Escola Pública (\texttt{EP\_<renda>\_<raça>[\_PCD]}), onde a renda é classificada como \texttt{R1} (inferior ou igual ao teto) ou \texttt{R2} (superior ao teto), e a raça como \texttt{PPI} (pretos, pardos, indígenas e quilombolas) ou \texttt{NPPI}. O sistema de inscrição do estudante foi inferido como a categoria mais restritiva em que ele obteve classificação publicada.
+
+Por fim, o estágio de filtros de consistência é aplicado para consolidar a base de dados final. Nela, são removidos todos os registros do subprograma 2014--2016, já que não há edital com as vagas por cota nem a indicação do sistema de concorrência nas convocações. Já para Engenharia de Software, os registros foram mantidos na tabela, mas a marcação do curso na coluna de área de computação foi apagada. Como o curso faz parte da entrada única de Engenharias do campus Gama e a escolha da área só ocorre após o ingresso, esse ajuste garante que as análises de computação considerem apenas os cursos com entrada direta.
+
+\subsection{Dataset Obtido}
+
+O pipeline gera três tabelas principais:
+\begin{itemize}
+    \item \textbf{Tabela de Candidatos:} contém um registro por candidato individual (totalizando mais de 200 mil registros), armazenando identificador anônimo, curso, turno, comparecimento às etapas, notas (EB1, EB2 e Nota de Redação das etapas 1 a 3), Argumento Final, classificações nas cotas, categoria de inscrição inferida, grupo de cota, dados de convocação (chamada, semestre e cota da vaga), homologação e situação judicial;
+
+    \item \textbf{Tabela de Cursos:} estruturada em nível agregado por subprograma $\times$ campus $\times$ turno $\times$ curso $\times$ semestre $\times$ categoria de cota, registrando vagas ofertadas, inscritos não eliminados, convocados totais, convocados em primeira chamada, última chamada realizada e as notas de corte de primeira e última chamada;
+
+    \item \textbf{Tabela de Metadados dos Subprogramas:} consolida os parâmetros temporais e normativos de cada triênio, incluindo datas de aplicação das provas, vigência do SISUnB, limite de renda estabelecido e a incidência do marco da Lei nº 14.723/2023.
+\end{itemize}
+
+\subsection{Validação e Confiabilidade dos Dados}
+
+Para assegurar a integridade dos dados extraídos, executou-se uma validação cruzada estruturada, alcançando 100\% de cobertura textual dos registros constantes nos editais de resultado final. A precisão da extração foi atestada por meio da leitura independente de uma amostra estratificada de 2.700 candidatos (totalizando mais de 52 mil campos avaliados), que apresentou 99,77\% de correspondência estrita. Ademais, a consistência das notas republicadas na terceira etapa, quando confrontadas com os editais originais das etapas iniciais, registrou concordância superior a 99,63\%, com a diferença restrita a retificações oficiais da banca.
+
+No âmbito estatístico e normativo, as médias e os desvios padrão calculados a partir da base reproduziram os relatórios oficiais do Cebraspe com divergência máxima inferior a 0,005 ponto. Verificou-se também a ordenação decrescente estrita entre o Argumento Final e a classificação oficial, conferindo 99,90\% de exatidão na identificação da nota de corte de cada chamada. Por fim, comprovou-se a aderência da modelagem à transição da Lei nº 14.723/2023: constatou-se que, até o subprograma 2021--2023, entre 7,4\% e 35,9\% dos cotistas convocados possuíam nota suficiente para ingresso no Sistema Universal; a partir de 2022--2024, essa proporção caiu para exatos 0,0\%, atestando que os dados capturam fielmente a nova regra de prioridade de alocação da ampla concorrência.
+
+\textit{Ressalvas e Limitações Metodológicas:} Em respeito à precisão científica, pontuam-se os limites do conjunto de dados:
+\begin{enumerate}
+    \item A métrica de ``inscritos'' reflete exclusivamente os candidatos presentes e não eliminados no PAS 3, haja vista que os editais públicos não divulgam relações preliminares de inscritos ausentes ou desclassificados no início da etapa;
+    \item A indicação de cota de concorrência e a opção de curso ocorrem unicamente na inscrição da terceira etapa. Dessa forma, participantes que evadiram ou foram eliminados nas etapas 1 e 2 possuem notas registradas, porém não permitem desagregação por cota pretendida ou curso de interesse;
+    \item No subprograma 2016--2018, o Cebraspe não disponibilizou a relação de registro acadêmico homologado, de modo que a aprovação foi aferida pelas convocações regulares;
+    \item No subprograma 2018--2020, em decorrência da suspensão das atividades pela pandemia de COVID-19, a universidade realizou o ingresso em chamada unificada (semestres 1 e 2 agrupados sob o código 0).
+\end{enumerate}
+
+\section{Resultados}
+
+\subsection{Evolução do Desempenho dos Sistemas de Concorrência}
+
+A evolução temporal do desempenho acadêmico dos candidatos pode ser visualizada por meio da trajetória das médias do Escore Bruto 1 (Língua Estrangeira), Escore Bruto 2 (Conhecimentos Específicos) e da Nota de Redação ao longo dos nove últimos subprogramas completos. Para a construção dessa análise, foram considerados exclusivamente os candidatos que alcançaram a terceira etapa (PAS 3) sem eliminação prévia. Os estudantes foram categorizados segundo o sistema de concorrência mais restritivo ao qual faziam jus no momento da inscrição final: Sistema Universal Estrito (SUE), Cotas para Negros (N), Escola Pública Não-PPI (EP Não-PPI) e Escola Pública PPI (EP PPI).
+
+Para conferir robustez à comparação, as visualizações incluem uma faixa sombreada que representa o intervalo de confiança de 95\% da média real amostral. O cálculo dessa dispersão demandou um volume mínimo de 2 candidatos por categoria avaliada em cada etapa. Adicionalmente, as provas cujas datas de aplicação sofreram alterações atípicas em virtude da pandemia de COVID-19 foram sinalizadas no eixo temporal com um asterisco (*).
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{F1_concat_geral.png}
+\caption{Evolução do Escore Bruto e Nota de Redação nas três etapas do PAS para todos os cursos da UnB (Cenário Geral). Provas marcadas com (*) indicam datas atípicas (período pandêmico). As faixas sombreadas representam o intervalo de confiança de 95\%.}
+\label{fig:f1_geral}
+\end{figure*}
+
+\subsubsection{O Cenário Geral da UnB como Linha de Base}
+A Figura \ref{fig:f1_geral} apresenta a consolidação de todos os cursos da universidade, estabelecendo uma linha de base comportamental do certame. A observação do cenário geral revela um padrão de consistência hierárquica. Ao longo da série histórica, as categorias mantêm uma ordem de desempenho com baixa variação nas provas objetivas: o SUE posiciona-se consistentemente no topo, seguido pelo EP Não-PPI e pela cota para Negros, que disputam posições e, por fim, pelo EP PPI, que ocupa o último lugar no geral.
+
+As curvas de desempenho sobem e descem de maneira altamente correlacionada entre os grupos em todos os subprogramas. Esse sincronismo indica que as flutuações das médias anuais são ditadas majoritariamente pela variação no nível de dificuldade das provas, afetando todos os estratos socioeconômicos de forma semelhante. Cabe destacar a resiliência das notas gerais durante o período da pandemia de COVID-19. Não foram registradas quedas discrepantes que pudessem ser isoladamente atribuídas ao ensino remoto, tornando difícil dissociar possíveis defasagens de aprendizado do mero nível de dificuldade da prova aplicada em determinado ano.
+
+Apesar da manutenção da hierarquia sociodemográfica, a distância (gap) entre as categorias apresenta indícios visuais de achatamento, especialmente nas edições mais recentes. Esse estreitamento é notório na prova de Redação, cujas notas médias convergem drasticamente entre os sistemas de concorrência. Conforme se avança do PAS 1 para o PAS 3, o desempenho em redação torna-se cada vez mais homogêneo, minimizando as disparidades estatísticas verificadas nas provas objetivas. Essa aproximação entre os sistemas ficará mais evidente na próxima subseção.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{F1_concat_computacao.png}
+\caption{Evolução do Escore Bruto e Nota de Redação nas três etapas do PAS restrita ao agrupamento dos cursos de Computação. Provas marcadas com (*) indicam datas atípicas. As faixas sombreadas representam o intervalo de confiança de 95\%.}
+\label{fig:f1_comp}
+\end{figure*}
+
+\subsubsection{O Cenário Específico da Computação}
+Ao restringir a análise aos cursos de Computação (Figura \ref{fig:f1_comp}), o comportamento difere substancialmente da linha de base da universidade. Observa-se uma volatilidade maior, acompanhada de ultrapassagens mais frequentes das categorias de cotas sobre o Sistema Universal Estrito.
+
+Embora o SUE ainda lidere o Escore Bruto 2 (a prova de maior peso) na maior parte da década, as últimas edições demonstram uma aproximação dos cotistas. No PAS 1 do subprograma 2021--2023, a categoria EP Não-PPI registrou a maior média absoluta do grupo. Já no PAS 3 do subprograma 2022--2024, a cota para Negros superou o SUE de forma inédita. No último subprograma avaliado, a média do SUE no EB2 terminou em posições inferiores ou equiparáveis as posições dessas últimas duas categorias de cotas, sugerindo uma expressiva elevação no nível competitivo dos candidatos cotistas que optam pela área tecnológica.
+
+Na Nota de Redação da Computação, a sobreposição das curvas atinge seu nível máximo. No PAS 3 das edições mais recentes, as médias brutas se aproximam consideravelmente e as diferentes categorias alternam a posição de maior nota sucessivas vezes. Esse comportamento sugere uma forte homogeneização no desempenho bruto de produção textual entre os concluintes interessados na área, um indício visual cuja magnitude de distanciamento será rigorosamente quantificada na análise de tamanho de efeito a seguir.
+
+Essas divergências em relação à média geral da UnB podem estar relacionadas a particularidades no perfil de concorrência da área. Como os cursos de Ciência da Computação e Engenharia de Computação figuram historicamente entre os mais disputados da instituição, é plausível inferir que a alta nota de corte exerça uma forte pressão seletiva, atraindo cotistas de altíssimo rendimento acadêmico. Levanta-se a hipótese de que esse fenômeno seja influenciado pela composição heterogênea de algumas categorias (como a cota étnico-racial, que não impõe restrição de origem escolar pública).
+
+Por outro lado, a estratificação desagregada por curso (cujos gráficos detalhados encontram-se disponíveis no repositório suplementar desta pesquisa) aponta que a Licenciatura em Computação destoa dessa tendência primária. O curso apresenta uma dinâmica de alta variância intra-grupo, com lideranças frequentes das categorias de escola pública sobre o SUE. Esse comportamento atípico em relação aos bacharelados pode estar associado não apenas ao menor número absoluto de candidatos em sua amostra estatística, mas também a fatores inerentes à sua oferta, como o turno noturno, que atrai um perfil de candidato distinto daquele que compõe a hipercompetitividade dos cursos diurnos.
+
+\subsection{Distância de Desempenho entre o Sistema Universal e as Cotas}
+
+Para quantificar o achatamento visual das curvas e medir o distanciamento real entre o Sistema Universal Estrito (SUE) e os cotistas de forma padronizada, utiliza-se o tamanho de efeito $d$ de Cohen:
+
+\begin{equation}
+    d = \frac{\overline{x}_{\mathrm{SUE}} - \overline{x}_{g}}{s_p}
+\end{equation}
+
+onde $g$ é o grupo de cotistas avaliado e $s_p$ é o desvio padrão combinado. Valores de $d>0$ indicam vantagem do SUE, e as referências de 0,2, 0,5 e 0,8 representam efeitos pequeno, médio e grande, respectivamente.
+
+Pela fórmula estrutural do PAS, a Parte II (Conhecimentos Específicos) compõe cerca de 83\% da nota de cada etapa. Em consequência, a curva de $d$ do Argumento Final (AF) acompanha quase perfeitamente a trajetória do Escore Bruto 2 (EB2). Provas de Língua Estrangeira (EB1) e Redação (NR) apresentam distâncias menores e pouco alteram o saldo final. O gap socioeconômico no AF reflete, portanto, essencialmente uma distância em conhecimentos específicos.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{F2_gap_cohen_d.png}
+\caption{Distância de desempenho ($d$ de Cohen) para cotistas de escola pública (EP) em todos os cursos da UnB. Valores positivos indicam vantagem do SUE. Faixa: IC de 95\%. Linha tracejada: Lei nº 14.723/2023.}
+\label{fig:f2_ep_geral}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{F2_gap_cohen_d_negros.png}
+\caption{Distância de desempenho ($d$ de Cohen) para a cota para Negros em todos os cursos da UnB.}
+\label{fig:f2_neg_geral}
+\end{figure}
+
+\subsubsection{A UnB como Linha de Base}
+O cenário geral de todos os cursos (Figuras \ref{fig:f2_ep_geral} e \ref{fig:f2_neg_geral}) evidencia uma queda estrutural na desigualdade. Para Escola Pública (EP), o $d$ do AF cai gradualmente de 0,69 (efeito médio-grande) em 2015--2017 para 0,21 (efeito pequeno) em 2023--2025. Na cota para Negros, que já partia de um patamar menor por não exigir origem pública, a distância cai de 0,45 para 0,23. Essa redução contínua teve início muito antes da pandemia e da sanção da Lei nº 14.723/2023, impossibilitando atribuir a queda isoladamente a esses eventos. Ainda assim, em nenhum dos nove subprogramas o intervalo de confiança do AF incluiu o zero, mantendo o SUE com vantagem estatisticamente distinguível no agregado da universidade.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{F2_gap_cohen_d_1.png}
+\caption{Distância de desempenho ($d$ de Cohen) para cotistas de escola pública (EP) nos cursos de Computação.}
+\label{fig:f2_ep_comp}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{F2_gap_cohen_d_negros_1.png}
+\caption{Distância de desempenho ($d$ de Cohen) para a cota para Negros nos cursos de Computação.}
+\label{fig:f2_neg_comp}
+\end{figure}
+
+\subsubsection{O Cenário da Computação e Fatores Exógenos}
+Ao isolar a Computação (Figuras \ref{fig:f2_ep_comp} e \ref{fig:f2_neg_comp}), as faixas de confiança alargam-se devido ao menor $n$ amostral, mas o comportamento difere substancialmente. O gap para EP já parte de um patamar historicamente menor (0,33) e oscila até sofrer uma queda brusca no último triênio, quando o AF cai para $-0{,}06$. Na cota para Negros, a queda recente alcança $-0{,}10$. Nesses subprogramas recentes, o intervalo de confiança finalmente engloba e ultrapassa a linha do zero, indicando a diluição da vantagem técnica do SUE. Gráficos complementares de análise estratificada por curso (disponíveis no repositório) confirmam que essa inversão é impulsionada majoritariamente pelos ingressantes de Ciência da Computação (CIC).
+
+Do ponto de vista temporal, os rompimentos abruptos no desempenho de EP e Negros coincidem com os primeiros editais da nova regra de prioridade de cotas. Contudo, essa superação técnica já se manifestava no histórico individual desses candidatos nas etapas 1 e 2, aplicadas antes da vigência da nova lei. Isso indica que a neutralização do gap não é um efeito direto do mecanismo da prova recente, mas possivelmente um reflexo de uma alteração drástica na composição e no nível de preparo de cotistas de alto rendimento que chegam ao final do certame disputando as vagas de tecnologia.
+
+\subsection{Distância de Desempenho por Categoria de Cotas}
+
+Para verificar se alguma subcategoria de escola pública destoa do agregado analisado até aqui, as Figuras~\ref{fig:f3_geral} e~\ref{fig:f3_comp} apresentam mapas de calor do $d$ de Cohen do AF de cada categoria de concorrência em relação ao SUE. Cada célula traz o valor de $d$ e, entre parênteses, o número de candidatos, que serve de guia para a confiabilidade da estimativa, já que o mapa não exibe intervalos de confiança. Células cinza indicam a referência ou categorias com $n$ abaixo do mínimo. Seguindo a Seção~IV, as categorias de EP combinam renda (R1, até o teto, ou R2, acima dele), raça (PPI ou Não-PPI) e deficiência (PcD). Como o teto passou de 1,5 para 1 salário mínimo em 2022--2024, as linhas R1 não são estritamente comparáveis antes e depois dessa data.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{F3_heatmap_argumento_final.png}
+\caption{Distância de desempenho ($d$ de Cohen) no AF entre o SUE e cada categoria de concorrência, em todos os cursos da UnB. Cada célula mostra $d$ e o número de candidatos; células cinza indicam a referência ou $n$ abaixo do mínimo. Linha tracejada: Lei nº 14.723/2023.}
+\label{fig:f3_geral}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{F3_heatmap_argumento_final_1.png}
+\caption{Distância de desempenho ($d$ de Cohen) no AF entre o SUE e cada categoria de concorrência, nos cursos de Computação. Mesma convenção da Figura~\ref{fig:f3_geral}.}
+\label{fig:f3_comp}
+\end{figure}
+
+\subsubsection{A UnB como Linha de Base}
+Na UnB como um todo (Figura~\ref{fig:f3_geral}), a cota para Negros e as quatro categorias de EP com amostra suficiente partem de distâncias médias a grandes e decrescem, mas em ritmos distintos. As categorias PPI lideram no início (0,76 em EP R2 PPI e 0,68 em EP R1 PPI, em 2015--2017) e sofrem as maiores quedas, chegando a 0,23 e 0,06 em 2023--2025. As categorias Não-PPI partem de um patamar menor (0,56) e recuam menos: EP R1 Não-PPI mantém 0,38 em 2023--2025, a maior distância do último subprograma, e EP R2 Não-PPI oscila, com mínimo de 0,02 em 2020--2022 e retorno a 0,20. A convergência do agregado é, portanto, puxada sobretudo pelas categorias PPI e não é uniforme entre as subcategorias. As categorias PcD têm $n$ insuficiente na maioria das células, e as poucas estimadas (como $-0{,}63$ com $n=7$) são instáveis, não permitindo conclusões. Por fim, a partir de 2022--2024 o número de candidatos nas categorias R1 diminui (em EP R1 Não-PPI, de 455 em 2021--2023 para 144 em 2023--2025) e o das categorias R2 aumenta, o que coincide com a redução do teto de renda.
+
+\subsubsection{O Cenário da Computação}
+Na Computação (Figura~\ref{fig:f3_comp}), as células têm $n$ de poucas dezenas de candidatos, contra centenas ou milhares na UnB, e o padrão por categoria é mais ruidoso, sem ordem estável entre elas. Ainda assim, as únicas estimativas negativas da série ocorrem em 2023--2025, na cota para Negros ($-0{,}10$, $n=28$) e em EP R2 Não-PPI ($-0{,}10$, $n=66$), categoria que reúne cerca de 70\% dos candidatos EP do subprograma. A queda não se restringe à maior categoria: EP R2 PPI, que oscilava entre 0,37 e 0,50 na maior parte da série, também recua para 0,11 ($n=16$), uma redução semelhante à de EP R2 Não-PPI (de 0,22 para $-0{,}10$). Antes de 2023--2025, portanto, não havia convergência generalizada entre as categorias. Em contrapartida, as categorias R1 caem abaixo do $n$ mínimo nesse subprograma (de 35 candidatos em 2022--2024 para sete), de modo que o gap agregado de EP ($-0{,}06$) descreve praticamente apenas candidatos R2, e não é possível estimar a distância para as faixas de menor renda.
+
+\subsection{Análise da seletividade dos cursos de TI nos subprogramas}
+
+Ao observar os últimos 9 subprogramas do PAS, é interessante ver como que a nota de corte dos cursos de TI se definiu dentro de cada categoria de cotas, em especial se trouxermos alguns fatores exógenos que podem ter influenciado na competitividade. Analisando os gráficos da posição ordinal da nota de corte para cada um dos cursos (Figuras~\ref{fig:f7_seletividade_bac}--\ref{fig:f7_seletividade_engc}), um dos principais padrões é a tendência de crescimento da competitividade a partir de 2021, o que pode estar ligado à expansão da digitalização pós-pandemia \cite{Sobaih2022Higher}, ou ao avanço agressivo da Inteligência Artificial no mercado de trabalho nos últimos anos. Outro comportamento interessante é o interesse pelo curso de licenciatura de computação ser o menor dos 4 cursos no Sistema Universal, sendo muito concorrido, no entanto, na categoria de EP/PPI. Isso pode ser indicativo da preferência por cursos noturnos para conciliar atividades extracurriculares com os cursos, tais como trabalho, cuidado familiar, ou até mesmo questões próprias do tempo de deslocamento até a universidade.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F7_seletividade_cursos_bac.png}
+\caption{Posição ordinal da nota de corte de Ciência da Computação (Bacharelado). A faixa cinza representa a média mais ou menos um desvio-padrão dos demais cursos; 1º indica a maior nota.}
+\label{fig:f7_seletividade_bac}
+\end{figure}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F7_seletividade_cursos_lic.png}
+\caption{Posição ordinal da nota de corte de Computação (Licenciatura), com a mesma convenção da Figura~\ref{fig:f7_seletividade_bac}.}
+\label{fig:f7_seletividade_lic}
+\end{figure}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F7_seletividade_cursos_engc.png}
+\caption{Posição ordinal da nota de corte de Engenharia de Computação, com a mesma convenção da Figura~\ref{fig:f7_seletividade_bac}.}
+\label{fig:f7_seletividade_engc}
+\end{figure}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F7_legenda.png}
+\end{figure}
+
+\subsection{Perspectiva da razão de candidatos por vaga}
+Não obstante, a afirmação feita na última análise é contrastada pelo gráfico que demonstra a evolução da razão $N_{\text{candidatos}} / N_{\text{vagas}}$. Esta, embora se mantenha relativamente constante ao longo dos subprogramas para a maioria dos cursos, demonstra comportamento variante no curso de licenciatura (F8). Nele, se observa uma tendência de aumento do interesse pelo curso nos candidatos do Sistema Universal, enquanto os estudantes concorrendo nas categorias de cotas para o curso têm diminuído em número, o que mostra uma certa seletividade maior nas categorias de cotas para a licenciatura do que nos concorrentes do Sistema Universal. Isso é refletido pela posição alta no \textit{ranking} de notas de corte, ainda que com poucos inscritos, concentrando o desempenho dos candidatos em uma média mais elevada. Vale observar, também, a queda abrupta na admissão de todos os cursos no subprograma de 2020, refletindo o impacto da pandemia na realização das provas, e, portanto, no ingresso dos alunos aos cursos em evidência.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F8_COMPUTACAO_LICENCIATURA.png}
+\caption{Análise do número de candidatos por vaga no curso de Licenciatura}
+\end{figure}
+
+\subsection{Análise da proporção de concorrentes para cada curso de TI}
+Uma outra tendência interessante pode ser observada nos gráficos da proporção de concorrentes para os cursos de TI a cada subprograma (Figuras~\ref{fig:f9_bac}--\ref{fig:f9_engc}), considerando as categorias de concorrência disponíveis. Em todos os gráficos, é possível observar o crescimento dos alunos ingressantes pelo Sistema Universal, ao passo que a proporção tende a diminuir para os alunos de cotas. Isso, de certa forma, denota uma certa ineficiência do sistema em alavancar o acesso dos estudantes-alvo aos cursos universitários, engessando a elitização da área acadêmica e profissional ligada à tecnologia \cite{Matheus2025Effectiveness}.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F9_legenda.png}
+\end{figure}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F9_CIENCIA_DA_COMPUTACAO_BACHARELADO.png}
+\caption{Composição dos inscritos por sistema de concorrência nos subprogramas do PAS: Ciência da Computação (Bacharelado).}
+\label{fig:f9_bac}
+\end{figure}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F9_COMPUTACAO_LICENCIATURA.png}
+\caption{Composição dos inscritos por sistema de concorrência nos subprogramas do PAS: Computação (Licenciatura).}
+\label{fig:f9_lic}
+\end{figure}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\columnwidth]{F9_ENGENHARIA_DE_COMPUTACAO_BACHARELADO.png}
+\caption{Composição dos inscritos por sistema de concorrência nos subprogramas do PAS: Engenharia de Computação.}
+\label{fig:f9_engc}
+\end{figure}
+
+\subsection{Evolução das notas de corte por sistema de concorrência}
+
+Para avaliar como a exigência mínima de ingresso evoluiu em cada sistema, definiu-se a nota de corte de um grupo como o menor Argumento Final entre os candidatos convocados na primeira chamada do primeiro semestre nas categorias daquele grupo. Os quatro grupos seguem a classificação adotada nas seções anteriores: Sistema Universal, Cotas para Negros, EP PPI e EP Não-PPI, estes dois últimos reunindo as faixas de renda R1 e R2. As categorias PcD foram excluídas do cálculo, pois dispõem de uma única vaga, frequentemente não preenchida, e o mínimo delas não representa o grupo. No subprograma 2018--2020, em que o ingresso foi unificado, considerou-se a chamada única. Cabe ressaltar que o Argumento Final é padronizado dentro de cada coorte (Equações 1 a 3); assim, a comparação entre subprogramas indica a posição relativa do último aprovado em relação aos demais candidatos do mesmo ano, e não um nível absoluto de conhecimento.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{F4_notas_corte.png}
+\caption{Nota de corte (menor Argumento Final entre os convocados da primeira chamada do primeiro semestre) por sistema de concorrência nos cursos de Computação. Faixas sombreadas: vigência do SISUnB e provas aplicadas durante a pandemia. Linha tracejada: Lei nº 14.723/2023.}
+\label{fig:f4_cortes}
+\end{figure*}
+
+A Figura~\ref{fig:f4_cortes} evidencia comportamentos distintos entre os cursos. Em Ciência da Computação, a nota de corte do Sistema Universal passou de 93 a 104 pontos entre 2015--2017 e 2017--2019 para 136 a 144 pontos entre 2020--2022 e 2023--2025, uma elevação de cerca de 40 pontos. Esse movimento acompanha o aumento da procura pelo curso, que passou de 138 candidatos não eliminados em 2015--2017 para até 423 em 2020--2022, mantidas as mesmas 40 vagas anuais, e converge com a tendência de crescimento da seletividade a partir de 2021 apontada na Seção~V-D. Em Engenharia de Computação, por sua vez, o corte do Sistema Universal permaneceu estável, em torno de 120 pontos, desde 2020--2022.
+
+Nos dois bacharelados, as notas de corte das cotas de Escola Pública situam-se, na maior parte da série, entre $-40$ e $+20$ pontos, ou seja, próximas da média da coorte e cerca de 100 a 140 pontos abaixo do Sistema Universal. A cota para Negros ocupa posição intermediária: em Ciência da Computação, seu corte subiu de 41 a 50 pontos entre 2015--2017 e 2018--2020 para 83 a 137 pontos a partir de 2019--2021, aproximando-se do Sistema Universal. Em Engenharia de Computação, o corte dessa cota oscila amplamente (de 21 a 143 pontos), reflexo da existência de apenas uma vaga por semestre. Esses resultados são compatíveis com a redução do $d$ de Cohen observada na Seção~V-B: à medida que os cotistas de alto rendimento se aproximam do Sistema Universal no desempenho médio, a exigência mínima de algumas cotas também se eleva.
+
+Quanto aos fatores exógenos, todas as notas de corte dos bacharelados caem em 2018--2020 (por exemplo, 78 e 76 pontos no Sistema Universal de Ciência da Computação e de Engenharia de Computação, respectivamente). Como nesse subprograma as 40 vagas anuais foram preenchidas em uma única seleção, essa queda está associada sobretudo à unificação do ingresso, e não necessariamente a um pior desempenho no período pandêmico. Já a partir da Lei nº 14.723/2023, que passou a preencher primeiro as vagas de ampla concorrência, espera-se que os cotistas de maior nota migrem para o Sistema Universal e que o corte das cotas diminua. Esse efeito aparece em Engenharia de Computação, onde o corte de EP PPI atinge $-47$ e $-67$ pontos em 2022--2024 e 2023--2025, os menores valores da série. Em Ciência da Computação, contudo, não há padrão claro, e com apenas dois subprogramas e categorias de uma a duas vagas não é possível afirmar uma mudança de tendência. Por fim, na Licenciatura em Computação, a procura é próxima ou inferior à oferta de 46 vagas anuais (de 27 a 72 candidatos não eliminados) e quase todos os candidatos são aprovados, de modo que o corte corresponde, em geral, à nota do último candidato disponível e não expressa concorrência efetiva.
+
+\subsection{Recuo da nota de corte nas chamadas suplementares}
+
+A nota de corte da primeira chamada não coincide com a nota do último candidato efetivamente convocado, já que desistências e vagas não ocupadas geram chamadas sucessivas e a seleção para o segundo semestre. Para mensurar esse recuo, calculou-se a diferença entre a nota de corte da primeira chamada do primeiro semestre e o menor Argumento Final entre todos os convocados do grupo, considerando todas as chamadas e ambos os semestres (Figura~\ref{fig:f5_recuo}). Valores positivos indicam que a exigência mínima cedeu ao longo do processo.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{F5_gap_nota_corte.png}
+\caption{Recuo da nota de corte: diferença entre o corte da primeira chamada do primeiro semestre e o Argumento Final do último candidato convocado (todas as chamadas e ambos os semestres), por sistema de concorrência. Linha tracejada: Lei nº 14.723/2023.}
+\label{fig:f5_recuo}
+\end{figure*}
+
+Nos dois bacharelados, o recuo está presente em todos os grupos, com medianas entre 20 e 82 pontos ao longo da série. Em Ciência da Computação, as medianas foram de 34 pontos no Sistema Universal, 49 na cota para Negros, 40 em EP PPI e 25 em EP Não-PPI; em Engenharia de Computação, de 38, 82, 48 e 20 pontos, respectivamente. A cota para Negros apresenta os maiores recuos (com picos de 129 pontos em Ciência da Computação, em 2021--2023, e de 119 pontos em Engenharia de Computação, em 2017--2019), pois, com uma única vaga por semestre, a desistência de um convocado transfere a vaga a um candidato posicionado bem abaixo na lista. No Sistema Universal, que conta com uma lista de espera extensa, o recuo é menor e mais estável, entre 29 e 49 pontos a partir de 2019--2021. Os valores mais elevados de Engenharia de Computação em 2015--2017 e 2016--2018 (122 e 162 pontos) coincidem com a vigência do SISUnB, quando a possibilidade de troca de curso após o resultado ampliava as desistências e o número de chamadas.
+
+Na Licenciatura em Computação, o recuo nas cotas é praticamente nulo, pois todos os candidatos cotistas já são convocados na primeira chamada e não há lista de espera. Em contrapartida, o recuo no Sistema Universal é elevado (mediana de 68 pontos), o que decorre da migração das vagas reservadas não preenchidas para a ampla concorrência, ocupadas por candidatos de menor Argumento Final. Após a Lei nº 14.723/2023, não se observa alteração sistemática no recuo em nenhum dos cursos.
+
+\subsection{Representação dos cotistas entre candidatos e aprovados}
+
+Por fim, para avaliar a efetividade do acesso via cotas, a Figura~\ref{fig:f6_representacao} compara, para cada curso e subprograma, a proporção de cotistas entre os candidatos não eliminados no PAS~3, a proporção de cotistas entre os aprovados (convocados em alguma chamada) e a proporção de aprovados que ingressaram por vaga reservada. Considerou-se cotista todo candidato inscrito na cota para Negros ou em qualquer categoria de Escola Pública, incluindo PcD. Como referência, a figura também apresenta a fração das vagas de cada curso reservada às cotas, de 55\% nos bacharelados e 56,5\% na licenciatura.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{F6_representacao_cotistas.png}
+\caption{Proporção de cotistas entre os candidatos, proporção de cotistas entre os aprovados e proporção de aprovados por vaga de cota nos cursos de Computação. A linha indica a fração das vagas reservadas às cotas. Linha tracejada: Lei nº 14.723/2023.}
+\label{fig:f6_representacao}
+\end{figure*}
+
+Nos bacharelados, os cotistas são minoria entre os candidatos, mas representam cerca de metade dos aprovados. Em Ciência da Computação, eles correspondem a entre 22\% e 38\% dos candidatos e a entre 47\% e 57\% dos aprovados, próximo dos 55\% de vagas reservadas, de modo que a reserva praticamente dobra sua presença entre os ingressantes (razão entre as proporções de 1,4 a 2,4). Em Engenharia de Computação, os cotistas aprovados ficaram abaixo da reserva até 2018--2020 (entre 32\% e 46\%), por insuficiência de candidatos cotistas, e passaram a 45\%--58\% a partir de 2019--2021. Considerando a nota de corte do Sistema Universal na Figura~\ref{fig:f4_cortes}, muito acima dos cortes das cotas, esses resultados indicam que, sem a reserva de vagas, a participação desses estudantes nos dois bacharelados seria substancialmente menor.
+
+Em contrapartida, a proporção de cotistas entre os candidatos de Ciência da Computação recuou de 38\% em 2017--2019 para 22\% em 2023--2025, período em que a procura total pelo curso cresceu. Esse dado converge com a Seção~V-F: o aumento da demanda pela Computação concentra-se em candidatos do Sistema Universal, e a política de cotas mantém a representação entre os aprovados, mas não se reflete em maior participação dos cotistas na demanda inicial. Na Licenciatura em Computação, quase todos os candidatos são aprovados, e a proporção de cotistas entre os aprovados reproduz a dos candidatos (entre 15\% e 44\%), permanecendo sempre abaixo da reserva de 56,5\%; as vagas reservadas sobram por falta de candidatos e migram para a ampla concorrência. Nesse curso, portanto, a limitação está na demanda, e não no acesso.
+
+Por fim, a Lei nº 14.723/2023 alterou a via de entrada, mas não a proporção total de cotistas aprovados. A diferença entre os cotistas aprovados e os aprovados por vaga reservada, que corresponde aos cotistas que ingressaram pelo Sistema Universal, permaneceu pequena nos bacharelados antes e depois da lei: no máximo 2 pontos percentuais em Ciência da Computação e até 5 pontos em Engenharia de Computação. Assim, poucos cotistas alcançam a nota de corte da ampla concorrência nesses cursos, e a nova regra modifica sobretudo o tipo de vaga ocupada, sem alterar de forma perceptível o número de cotistas que ingressam.
+
+\section{Conclusão e Trabalhos Futuros}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
