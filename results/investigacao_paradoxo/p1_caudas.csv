@@ -1,0 +1,238 @@
+recorte,subprograma,grupo,n,pct_af_negativo,pct_af_menor_-50,pct_af_maior_100
+UnB (todos os cursos),15-17,Universal,6192,47.2868,11.0465,6.6053
+UnB (todos os cursos),15-17,Negros,712,66.8539,19.9438,2.1067
+UnB (todos os cursos),15-17,EP PPI,1319,82.7142,22.7445,0.7582
+UnB (todos os cursos),15-17,EP Não-PPI,1056,75.3788,18.9394,1.4205
+UnB (todos os cursos),16-18,Universal,6230,48.0578,12.5522,6.7416
+UnB (todos os cursos),16-18,Negros,682,66.1290,20.2346,1.1730
+UnB (todos os cursos),16-18,EP PPI,1533,76.0600,20.0913,0.3262
+UnB (todos os cursos),16-18,EP Não-PPI,1244,68.4887,17.1222,1.2058
+UnB (todos os cursos),17-19,Universal,6194,45.6248,12.9964,6.0865
+UnB (todos os cursos),17-19,Negros,620,64.5161,18.0645,2.0968
+UnB (todos os cursos),17-19,EP PPI,1688,77.1919,22.8081,0.2962
+UnB (todos os cursos),17-19,EP Não-PPI,1451,65.6099,15.6444,1.3784
+UnB (todos os cursos),18-20,Universal,3789,48.6408,14.0406,6.2813
+UnB (todos os cursos),18-20,Negros,436,63.5321,19.0367,2.0642
+UnB (todos os cursos),18-20,EP PPI,833,74.5498,18.4874,0.7203
+UnB (todos os cursos),18-20,EP Não-PPI,896,65.8482,14.2857,2.1205
+UnB (todos os cursos),19-21,Universal,5670,50.4409,14.9912,5.7672
+UnB (todos os cursos),19-21,Negros,564,69.8582,24.8227,1.0638
+UnB (todos os cursos),19-21,EP PPI,1086,67.3112,17.9558,0.9208
+UnB (todos os cursos),19-21,EP Não-PPI,1267,57.6953,12.9440,2.4467
+UnB (todos os cursos),20-22,Universal,5140,52.9572,14.5331,5.4475
+UnB (todos os cursos),20-22,Negros,380,65.0000,18.1579,0.7895
+UnB (todos os cursos),20-22,EP PPI,850,71.7647,18.5882,0.7059
+UnB (todos os cursos),20-22,EP Não-PPI,929,55.1130,11.0872,3.1216
+UnB (todos os cursos),21-23,Universal,5673,51.3837,14.1019,5.3235
+UnB (todos os cursos),21-23,Negros,451,60.7539,12.6386,2.6608
+UnB (todos os cursos),21-23,EP PPI,427,68.1499,14.7541,1.6393
+UnB (todos os cursos),21-23,EP Não-PPI,1470,67.3469,16.1905,1.6327
+UnB (todos os cursos),22-24,Universal,5887,51.4863,15.6107,5.2658
+UnB (todos os cursos),22-24,Negros,342,57.6023,16.3743,3.8012
+UnB (todos os cursos),22-24,EP PPI,478,62.3431,14.8536,1.2552
+UnB (todos os cursos),22-24,EP Não-PPI,1795,66.9081,17.6045,1.8384
+UnB (todos os cursos),23-25,Universal,6286,52.5294,16.2743,5.4088
+UnB (todos os cursos),23-25,Negros,495,62.4242,18.7879,2.8283
+UnB (todos os cursos),23-25,EP PPI,436,61.2385,12.8440,1.3761
+UnB (todos os cursos),23-25,EP Não-PPI,1491,63.4474,15.9624,2.3474
+UnB (todos os cursos),todos,Universal,51061,49.7856,13.9872,5.8812
+UnB (todos os cursos),todos,Negros,4682,64.6091,19.0090,1.9863
+UnB (todos os cursos),todos,EP PPI,8650,73.7341,19.5376,0.7052
+UnB (todos os cursos),todos,EP Não-PPI,11599,65.2642,15.7514,1.9053
+Computação (3 cursos),15-17,Universal,190,52.6316,12.6316,8.9474
+Computação (3 cursos),15-17,Negros,17,82.3529,5.8824,5.8824
+Computação (3 cursos),15-17,EP PPI,27,74.0741,3.7037,0.0000
+Computação (3 cursos),15-17,EP Não-PPI,25,64.0000,12.0000,12.0000
+Computação (3 cursos),16-18,Universal,208,57.2115,15.3846,13.4615
+Computação (3 cursos),16-18,Negros,21,61.9048,19.0476,0.0000
+Computação (3 cursos),16-18,EP PPI,56,64.2857,10.7143,1.7857
+Computação (3 cursos),16-18,EP Não-PPI,30,60.0000,30.0000,10.0000
+Computação (3 cursos),17-19,Universal,293,54.2662,15.0171,8.1911
+Computação (3 cursos),17-19,Negros,30,73.3333,20.0000,6.6667
+Computação (3 cursos),17-19,EP PPI,76,69.7368,13.1579,0.0000
+Computação (3 cursos),17-19,EP Não-PPI,66,62.1212,15.1515,0.0000
+Computação (3 cursos),18-20,Universal,247,47.7733,12.9555,6.0729
+Computação (3 cursos),18-20,Negros,25,48.0000,12.0000,0.0000
+Computação (3 cursos),18-20,EP PPI,34,64.7059,14.7059,0.0000
+Computação (3 cursos),18-20,EP Não-PPI,35,68.5714,14.2857,2.8571
+Computação (3 cursos),19-21,Universal,426,49.7653,14.7887,8.4507
+Computação (3 cursos),19-21,Negros,38,63.1579,10.5263,0.0000
+Computação (3 cursos),19-21,EP PPI,51,70.5882,11.7647,1.9608
+Computação (3 cursos),19-21,EP Não-PPI,75,50.6667,8.0000,4.0000
+Computação (3 cursos),20-22,Universal,444,49.3243,13.9640,9.4595
+Computação (3 cursos),20-22,Negros,29,62.0690,13.7931,0.0000
+Computação (3 cursos),20-22,EP PPI,73,67.1233,17.8082,0.0000
+Computação (3 cursos),20-22,EP Não-PPI,64,60.9375,10.9375,7.8125
+Computação (3 cursos),21-23,Universal,438,50.2283,14.1553,13.4703
+Computação (3 cursos),21-23,Negros,23,47.8261,17.3913,4.3478
+Computação (3 cursos),21-23,EP PPI,36,47.2222,8.3333,0.0000
+Computação (3 cursos),21-23,EP Não-PPI,81,58.0247,18.5185,7.4074
+Computação (3 cursos),22-24,Universal,476,53.1513,17.2269,10.0840
+Computação (3 cursos),22-24,Negros,32,46.8750,18.7500,6.2500
+Computação (3 cursos),22-24,EP PPI,38,71.0526,23.6842,0.0000
+Computação (3 cursos),22-24,EP Não-PPI,133,63.9098,11.2782,2.2556
+Computação (3 cursos),23-25,Universal,457,54.9234,18.1619,10.2845
+Computação (3 cursos),23-25,Negros,28,46.4286,7.1429,7.1429
+Computação (3 cursos),23-25,EP PPI,19,47.3684,5.2632,0.0000
+Computação (3 cursos),23-25,EP Não-PPI,74,43.2432,8.1081,1.3514
+Computação (3 cursos),todos,Universal,3179,51.9346,15.2249,9.9402
+Computação (3 cursos),todos,Negros,243,58.4362,13.9918,3.2922
+Computação (3 cursos),todos,EP PPI,410,65.6098,13.1707,0.4878
+Computação (3 cursos),todos,EP Não-PPI,583,58.3190,13.0360,4.2882
+Bacharelados (CC + Eng. Comp.),15-17,Universal,156,46.7949,12.1795,10.8974
+Bacharelados (CC + Eng. Comp.),15-17,Negros,12,75.0000,8.3333,8.3333
+Bacharelados (CC + Eng. Comp.),15-17,EP PPI,26,76.9231,3.8462,0.0000
+Bacharelados (CC + Eng. Comp.),15-17,EP Não-PPI,20,55.0000,10.0000,15.0000
+Bacharelados (CC + Eng. Comp.),16-18,Universal,156,48.7179,12.8205,17.9487
+Bacharelados (CC + Eng. Comp.),16-18,Negros,16,50.0000,12.5000,0.0000
+Bacharelados (CC + Eng. Comp.),16-18,EP PPI,45,55.5556,6.6667,2.2222
+Bacharelados (CC + Eng. Comp.),16-18,EP Não-PPI,26,57.6923,26.9231,11.5385
+Bacharelados (CC + Eng. Comp.),17-19,Universal,278,52.5180,14.0288,8.6331
+Bacharelados (CC + Eng. Comp.),17-19,Negros,30,73.3333,20.0000,6.6667
+Bacharelados (CC + Eng. Comp.),17-19,EP PPI,68,66.1765,7.3529,0.0000
+Bacharelados (CC + Eng. Comp.),17-19,EP Não-PPI,62,59.6774,16.1290,0.0000
+Bacharelados (CC + Eng. Comp.),18-20,Universal,225,44.8889,12.0000,6.6667
+Bacharelados (CC + Eng. Comp.),18-20,Negros,25,48.0000,12.0000,0.0000
+Bacharelados (CC + Eng. Comp.),18-20,EP PPI,33,66.6667,15.1515,0.0000
+Bacharelados (CC + Eng. Comp.),18-20,EP Não-PPI,31,67.7419,16.1290,3.2258
+Bacharelados (CC + Eng. Comp.),19-21,Universal,396,46.9697,14.3939,9.0909
+Bacharelados (CC + Eng. Comp.),19-21,Negros,36,61.1111,11.1111,0.0000
+Bacharelados (CC + Eng. Comp.),19-21,EP PPI,48,68.7500,8.3333,2.0833
+Bacharelados (CC + Eng. Comp.),19-21,EP Não-PPI,73,49.3151,5.4795,4.1096
+Bacharelados (CC + Eng. Comp.),20-22,Universal,418,48.0861,13.1579,10.0478
+Bacharelados (CC + Eng. Comp.),20-22,Negros,28,60.7143,10.7143,0.0000
+Bacharelados (CC + Eng. Comp.),20-22,EP PPI,63,61.9048,15.8730,0.0000
+Bacharelados (CC + Eng. Comp.),20-22,EP Não-PPI,62,59.6774,11.2903,8.0645
+Bacharelados (CC + Eng. Comp.),21-23,Universal,411,50.1217,14.1119,14.3552
+Bacharelados (CC + Eng. Comp.),21-23,Negros,20,45.0000,20.0000,5.0000
+Bacharelados (CC + Eng. Comp.),21-23,EP PPI,35,45.7143,8.5714,0.0000
+Bacharelados (CC + Eng. Comp.),21-23,EP Não-PPI,78,57.6923,17.9487,7.6923
+Bacharelados (CC + Eng. Comp.),22-24,Universal,441,50.7937,16.7800,10.8844
+Bacharelados (CC + Eng. Comp.),22-24,Negros,30,43.3333,16.6667,6.6667
+Bacharelados (CC + Eng. Comp.),22-24,EP PPI,37,70.2703,24.3243,0.0000
+Bacharelados (CC + Eng. Comp.),22-24,EP Não-PPI,124,62.9032,9.6774,2.4194
+Bacharelados (CC + Eng. Comp.),23-25,Universal,416,52.8846,17.0673,11.2981
+Bacharelados (CC + Eng. Comp.),23-25,Negros,26,42.3077,7.6923,7.6923
+Bacharelados (CC + Eng. Comp.),23-25,EP PPI,19,47.3684,5.2632,0.0000
+Bacharelados (CC + Eng. Comp.),23-25,EP Não-PPI,69,39.1304,8.6957,1.4493
+Bacharelados (CC + Eng. Comp.),todos,Universal,2897,49.4650,14.4978,10.9078
+Bacharelados (CC + Eng. Comp.),todos,Negros,223,55.1570,13.4529,3.5874
+Bacharelados (CC + Eng. Comp.),todos,EP PPI,374,62.8342,10.9626,0.5348
+Bacharelados (CC + Eng. Comp.),todos,EP Não-PPI,545,56.3303,12.2936,4.5872
+Ciência da Computação,15-17,Universal,102,54.9020,15.6863,5.8824
+Ciência da Computação,15-17,Negros,7,85.7143,0.0000,0.0000
+Ciência da Computação,15-17,EP PPI,16,81.2500,6.2500,0.0000
+Ciência da Computação,15-17,EP Não-PPI,13,61.5385,15.3846,0.0000
+Ciência da Computação,16-18,Universal,98,46.9388,13.2653,12.2449
+Ciência da Computação,16-18,Negros,9,55.5556,22.2222,0.0000
+Ciência da Computação,16-18,EP PPI,23,56.5217,8.6957,4.3478
+Ciência da Computação,16-18,EP Não-PPI,14,57.1429,35.7143,14.2857
+Ciência da Computação,17-19,Universal,182,57.1429,14.8352,3.8462
+Ciência da Computação,17-19,Negros,20,75.0000,25.0000,0.0000
+Ciência da Computação,17-19,EP PPI,47,72.3404,8.5106,0.0000
+Ciência da Computação,17-19,EP Não-PPI,46,63.0435,17.3913,0.0000
+Ciência da Computação,18-20,Universal,148,47.2973,14.1892,3.3784
+Ciência da Computação,18-20,Negros,17,41.1765,5.8824,0.0000
+Ciência da Computação,18-20,EP PPI,20,75.0000,20.0000,0.0000
+Ciência da Computação,18-20,EP Não-PPI,25,72.0000,20.0000,4.0000
+Ciência da Computação,19-21,Universal,252,50.7937,14.6825,4.7619
+Ciência da Computação,19-21,Negros,27,66.6667,11.1111,0.0000
+Ciência da Computação,19-21,EP PPI,28,75.0000,7.1429,0.0000
+Ciência da Computação,19-21,EP Não-PPI,53,49.0566,7.5472,3.7736
+Ciência da Computação,20-22,Universal,317,50.1577,13.8801,8.8328
+Ciência da Computação,20-22,Negros,25,60.0000,8.0000,0.0000
+Ciência da Computação,20-22,EP PPI,41,60.9756,17.0732,0.0000
+Ciência da Computação,20-22,EP Não-PPI,40,65.0000,15.0000,7.5000
+Ciência da Computação,21-23,Universal,266,54.1353,15.7895,13.5338
+Ciência da Computação,21-23,Negros,13,46.1538,15.3846,7.6923
+Ciência da Computação,21-23,EP PPI,20,40.0000,10.0000,0.0000
+Ciência da Computação,21-23,EP Não-PPI,46,58.6957,21.7391,10.8696
+Ciência da Computação,22-24,Universal,284,54.5775,17.9577,10.5634
+Ciência da Computação,22-24,Negros,15,46.6667,26.6667,0.0000
+Ciência da Computação,22-24,EP PPI,24,66.6667,16.6667,0.0000
+Ciência da Computação,22-24,EP Não-PPI,84,66.6667,11.9048,2.3810
+Ciência da Computação,23-25,Universal,263,57.0342,20.5323,10.2662
+Ciência da Computação,23-25,Negros,17,47.0588,11.7647,11.7647
+Ciência da Computação,23-25,EP PPI,12,33.3333,0.0000,0.0000
+Ciência da Computação,23-25,EP Não-PPI,44,36.3636,6.8182,2.2727
+Ciência da Computação,todos,Universal,1912,52.9289,15.9519,8.5251
+Ciência da Computação,todos,Negros,150,58.0000,14.0000,2.0000
+Ciência da Computação,todos,EP PPI,231,64.5022,11.2554,0.4329
+Ciência da Computação,todos,EP Não-PPI,365,58.6301,14.5205,4.3836
+Engenharia de Computação,15-17,Universal,54,31.4815,5.5556,20.3704
+Engenharia de Computação,15-17,Negros,5,60.0000,20.0000,20.0000
+Engenharia de Computação,15-17,EP PPI,10,70.0000,0.0000,0.0000
+Engenharia de Computação,15-17,EP Não-PPI,7,42.8571,0.0000,42.8571
+Engenharia de Computação,16-18,Universal,58,51.7241,12.0690,27.5862
+Engenharia de Computação,16-18,Negros,7,42.8571,0.0000,0.0000
+Engenharia de Computação,16-18,EP PPI,22,54.5455,4.5455,0.0000
+Engenharia de Computação,16-18,EP Não-PPI,12,58.3333,16.6667,8.3333
+Engenharia de Computação,17-19,Universal,96,43.7500,12.5000,17.7083
+Engenharia de Computação,17-19,Negros,10,70.0000,10.0000,20.0000
+Engenharia de Computação,17-19,EP PPI,21,52.3810,4.7619,0.0000
+Engenharia de Computação,17-19,EP Não-PPI,16,50.0000,12.5000,0.0000
+Engenharia de Computação,18-20,Universal,77,40.2597,7.7922,12.9870
+Engenharia de Computação,18-20,Negros,8,62.5000,25.0000,0.0000
+Engenharia de Computação,18-20,EP PPI,13,53.8462,7.6923,0.0000
+Engenharia de Computação,18-20,EP Não-PPI,6,50.0000,0.0000,0.0000
+Engenharia de Computação,19-21,Universal,144,40.2778,13.8889,16.6667
+Engenharia de Computação,19-21,Negros,9,44.4444,11.1111,0.0000
+Engenharia de Computação,19-21,EP PPI,20,60.0000,10.0000,5.0000
+Engenharia de Computação,19-21,EP Não-PPI,20,50.0000,0.0000,5.0000
+Engenharia de Computação,20-22,Universal,101,41.5842,10.8911,13.8614
+Engenharia de Computação,20-22,Negros,3,66.6667,33.3333,0.0000
+Engenharia de Computação,20-22,EP PPI,22,63.6364,13.6364,0.0000
+Engenharia de Computação,20-22,EP Não-PPI,22,50.0000,4.5455,9.0909
+Engenharia de Computação,21-23,Universal,145,42.7586,11.0345,15.8621
+Engenharia de Computação,21-23,Negros,7,42.8571,28.5714,0.0000
+Engenharia de Computação,21-23,EP PPI,15,53.3333,6.6667,0.0000
+Engenharia de Computação,21-23,EP Não-PPI,32,56.2500,12.5000,3.1250
+Engenharia de Computação,22-24,Universal,157,43.9490,14.6497,11.4650
+Engenharia de Computação,22-24,Negros,15,40.0000,6.6667,13.3333
+Engenharia de Computação,22-24,EP PPI,13,76.9231,38.4615,0.0000
+Engenharia de Computação,22-24,EP Não-PPI,40,55.0000,5.0000,2.5000
+Engenharia de Computação,23-25,Universal,153,45.7516,11.1111,13.0719
+Engenharia de Computação,23-25,Negros,9,33.3333,0.0000,0.0000
+Engenharia de Computação,23-25,EP PPI,7,71.4286,14.2857,0.0000
+Engenharia de Computação,23-25,EP Não-PPI,25,44.0000,12.0000,0.0000
+Engenharia de Computação,todos,Universal,985,42.7411,11.6751,15.5330
+Engenharia de Computação,todos,Negros,73,49.3151,12.3288,6.8493
+Engenharia de Computação,todos,EP PPI,143,60.1399,10.4895,0.6993
+Engenharia de Computação,todos,EP Não-PPI,180,51.6667,7.7778,5.0000
+Licenciatura em Computação,15-17,Universal,34,79.4118,14.7059,0.0000
+Licenciatura em Computação,15-17,Negros,5,100.0000,0.0000,0.0000
+Licenciatura em Computação,15-17,EP PPI,1,0.0000,0.0000,0.0000
+Licenciatura em Computação,15-17,EP Não-PPI,5,100.0000,20.0000,0.0000
+Licenciatura em Computação,16-18,Universal,52,82.6923,23.0769,0.0000
+Licenciatura em Computação,16-18,Negros,5,100.0000,40.0000,0.0000
+Licenciatura em Computação,16-18,EP PPI,11,100.0000,27.2727,0.0000
+Licenciatura em Computação,16-18,EP Não-PPI,4,75.0000,50.0000,0.0000
+Licenciatura em Computação,17-19,Universal,15,86.6667,33.3333,0.0000
+Licenciatura em Computação,17-19,EP PPI,8,100.0000,62.5000,0.0000
+Licenciatura em Computação,17-19,EP Não-PPI,4,100.0000,0.0000,0.0000
+Licenciatura em Computação,18-20,Universal,22,77.2727,22.7273,0.0000
+Licenciatura em Computação,18-20,EP PPI,1,0.0000,0.0000,0.0000
+Licenciatura em Computação,18-20,EP Não-PPI,4,75.0000,0.0000,0.0000
+Licenciatura em Computação,19-21,Universal,30,86.6667,20.0000,0.0000
+Licenciatura em Computação,19-21,Negros,2,100.0000,0.0000,0.0000
+Licenciatura em Computação,19-21,EP PPI,3,100.0000,66.6667,0.0000
+Licenciatura em Computação,19-21,EP Não-PPI,2,100.0000,100.0000,0.0000
+Licenciatura em Computação,20-22,Universal,26,69.2308,26.9231,0.0000
+Licenciatura em Computação,20-22,Negros,1,100.0000,100.0000,0.0000
+Licenciatura em Computação,20-22,EP PPI,10,100.0000,30.0000,0.0000
+Licenciatura em Computação,20-22,EP Não-PPI,2,100.0000,0.0000,0.0000
+Licenciatura em Computação,21-23,Universal,27,51.8519,14.8148,0.0000
+Licenciatura em Computação,21-23,Negros,3,66.6667,0.0000,0.0000
+Licenciatura em Computação,21-23,EP PPI,1,100.0000,0.0000,0.0000
+Licenciatura em Computação,21-23,EP Não-PPI,3,66.6667,33.3333,0.0000
+Licenciatura em Computação,22-24,Universal,35,82.8571,22.8571,0.0000
+Licenciatura em Computação,22-24,Negros,2,100.0000,50.0000,0.0000
+Licenciatura em Computação,22-24,EP PPI,1,100.0000,0.0000,0.0000
+Licenciatura em Computação,22-24,EP Não-PPI,9,77.7778,33.3333,0.0000
+Licenciatura em Computação,23-25,Universal,41,75.6098,29.2683,0.0000
+Licenciatura em Computação,23-25,Negros,2,100.0000,0.0000,0.0000
+Licenciatura em Computação,23-25,EP Não-PPI,5,100.0000,0.0000,0.0000
+Licenciatura em Computação,todos,Universal,282,77.3050,22.6950,0.0000
+Licenciatura em Computação,todos,Negros,20,95.0000,20.0000,0.0000
+Licenciatura em Computação,todos,EP PPI,36,94.4444,36.1111,0.0000
+Licenciatura em Computação,todos,EP Não-PPI,38,86.8421,23.6842,0.0000

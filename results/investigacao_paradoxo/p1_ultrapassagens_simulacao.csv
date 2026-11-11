@@ -1,0 +1,4 @@
+conjunto,comparacoes,ultrapassagens_observadas,esperadas_pelo_acaso_media,esperadas_ic90_inf,esperadas_ic90_sup,p_observado_maior_ou_igual
+todas as provas,243,47,42.1348,33.0000,51.0000,0.2160
+EB2,81,9,5.5465,2.0000,9.0000,0.0898
+Redação,81,24,20.9054,15.0000,27.0000,0.2481

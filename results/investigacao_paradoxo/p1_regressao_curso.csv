@@ -1,0 +1,13 @@
+termo,coef,ep_robusto,p,ic_inf,ic_sup
+Intercept,8.6532,3.3485,0.0098,2.0903,15.2160
+"C(grupo_concorrencia, Treatment('Universal'))[T.EP Não-PPI]",-8.4656,2.8485,0.0030,-14.0484,-2.8827
+"C(grupo_concorrencia, Treatment('Universal'))[T.EP PPI]",-16.7142,2.7442,0.0000,-22.0927,-11.3356
+"C(grupo_concorrencia, Treatment('Universal'))[T.Negros]",-9.8955,3.9475,0.0122,-17.6324,-2.1585
+"C(curso_nome, Treatment('Ciência da Computação'))[T.Engenharia de Computação]",17.5707,2.4434,0.0000,12.7817,22.3598
+"C(curso_nome, Treatment('Ciência da Computação'))[T.Licenciatura em Computação]",-30.7592,2.6100,0.0000,-35.8746,-25.6438
+"C(grupo_concorrencia, Treatment('Universal'))[T.EP Não-PPI]:C(curso_nome, Treatment('Ciência da Computação'))[T.Engenharia de Computação]",-11.1178,4.8480,0.0218,-20.6198,-1.6158
+"C(grupo_concorrencia, Treatment('Universal'))[T.EP PPI]:C(curso_nome, Treatment('Ciência da Computação'))[T.Engenharia de Computação]",-13.9353,4.4922,0.0019,-22.7398,-5.1308
+"C(grupo_concorrencia, Treatment('Universal'))[T.Negros]:C(curso_nome, Treatment('Ciência da Computação'))[T.Engenharia de Computação]",-6.9761,7.7072,0.3654,-22.0820,8.1298
+"C(grupo_concorrencia, Treatment('Universal'))[T.EP Não-PPI]:C(curso_nome, Treatment('Ciência da Computação'))[T.Licenciatura em Computação]",2.6784,5.6802,0.6373,-8.4546,13.8114
+"C(grupo_concorrencia, Treatment('Universal'))[T.EP PPI]:C(curso_nome, Treatment('Ciência da Computação'))[T.Licenciatura em Computação]",-1.0654,5.7839,0.8539,-12.4016,10.2708
+"C(grupo_concorrencia, Treatment('Universal'))[T.Negros]:C(curso_nome, Treatment('Ciência da Computação'))[T.Licenciatura em Computação]",3.5979,7.0776,0.6112,-10.2738,17.4697

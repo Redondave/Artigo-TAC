@@ -1,0 +1,19 @@
+recorte,periodo,comparacao,n_negros,n_ref,ks_distancia,p_valor,mediana_negros,mediana_ref,dp_negros,dp_ref
+UnB (todos os cursos),todos,Negros × SUE,4682,51061,0.1516,0.0000,-16.7400,0.2580,44.2296,53.2124
+UnB (todos os cursos),todos,Negros × EP,4682,20249,0.0549,0.0000,-16.7400,-18.6470,44.2296,39.8137
+UnB (todos os cursos),15-17 a 21-23,Negros × SUE,3845,38888,0.1677,0.0000,-17.3350,1.2465,43.6401,53.0907
+UnB (todos os cursos),15-17 a 21-23,Negros × EP,3845,16049,0.0594,0.0000,-17.3350,-19.7410,43.6401,38.8766
+UnB (todos os cursos),22-24 e 23-25,Negros × SUE,837,12173,0.1027,0.0000,-13.9510,-3.1290,46.6279,53.4887
+UnB (todos os cursos),22-24 e 23-25,Negros × EP,837,4200,0.0506,0.0536,-13.9510,-14.9955,46.6279,42.8825
+Computação (3 cursos),todos,Negros × SUE,243,3179,0.1244,0.0017,-10.3440,-2.9900,47.2271,59.9504
+Computação (3 cursos),todos,Negros × EP,243,993,0.0600,0.4633,-10.3440,-10.6960,47.2271,42.6172
+Computação (3 cursos),15-17 a 21-23,Negros × SUE,183,2246,0.1559,0.0005,-11.4680,-1.7415,44.9179,59.4811
+Computação (3 cursos),15-17 a 21-23,Negros × EP,183,729,0.0498,0.8403,-11.4680,-12.4430,44.9179,42.3214
+Computação (3 cursos),22-24 e 23-25,Negros × SUE,60,933,0.1280,0.2879,4.4295,-5.4060,52.3876,60.9930
+Computação (3 cursos),22-24 e 23-25,Negros × EP,60,264,0.1447,0.2331,4.4295,-6.6020,52.3876,43.2746
+Bacharelados (CC + Eng. Comp.),todos,Negros × SUE,223,2897,0.1333,0.0011,-7.3490,0.7430,48.1099,60.8445
+Bacharelados (CC + Eng. Comp.),todos,Negros × EP,223,919,0.0685,0.3505,-7.3490,-7.9160,48.1099,42.7333
+Bacharelados (CC + Eng. Comp.),15-17 a 21-23,Negros × SUE,167,2040,0.1664,0.0003,-10.8140,2.2290,45.8764,60.3693
+Bacharelados (CC + Eng. Comp.),15-17 a 21-23,Negros × EP,167,670,0.0543,0.8021,-10.8140,-10.0850,45.8764,42.4744
+Bacharelados (CC + Eng. Comp.),22-24 e 23-25,Negros × SUE,56,857,0.1231,0.3707,10.0215,-3.1760,52.7726,61.8825
+Bacharelados (CC + Eng. Comp.),22-24 e 23-25,Negros × EP,56,249,0.1627,0.1572,10.0215,-5.1860,52.7726,43.3595
